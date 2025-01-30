@@ -16,7 +16,7 @@ public class TransactionEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @NotNull
+    @Column(name = "id")
     private Long id;
 
     @ManyToOne
@@ -32,5 +32,8 @@ public class TransactionEntity {
 
     @Column
     private Double amount;
+
+    @Column
+    private Double percentage;
 
 }

@@ -1,6 +1,6 @@
 package com.openclassrooms.payMyBuddy.exception;
 
-import java.io.IOException;
+
 
 public class UserNotFoundException extends RuntimeException {
 

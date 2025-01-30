@@ -17,19 +17,23 @@ public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @NotNull
+    @Column(name = "id")
     private Long id;
 
     @Column(nullable = false)
     private String username;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String email;
 
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = true)
+    private Double sold;
+
     @OneToMany
+    @JsonBackReference
     private List<UserEntity> connections;
 
     @OneToMany

@@ -1,7 +1,9 @@
 package com.openclassrooms.payMyBuddy.model;
 
 
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.Objects;
@@ -13,11 +15,12 @@ import java.util.Objects;
 @Setter
 public class UserModel {
 
-    @NotEmpty
+    @NotBlank(message = "Le nom d'utilisateur est obligatoire")
     private String username;
-    @NotEmpty(message = "L'email ne peut pas être vide")
+    @NotBlank(message = "L'email ne peut pas être vide")
+    @Email(message = "L'email doit être valide")
     private String email;
-    @NotEmpty(message = "Le mot de passe ne peut pas être vide")
+    @Size(min=4, message = "Le mot de passe doit contenir au moins 4 caractères")
     private String password;
 
 
