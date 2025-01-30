@@ -7,6 +7,7 @@ import com.openclassrooms.payMyBuddy.exception.ReceiverNotFoundException;
 import com.openclassrooms.payMyBuddy.exception.UserNotFoundException;
 import com.openclassrooms.payMyBuddy.mapper.TransactionMapper;
 import com.openclassrooms.payMyBuddy.model.TransactionModel;
+import com.openclassrooms.payMyBuddy.model.UserConnexionModel;
 import com.openclassrooms.payMyBuddy.repository.TransactionRepository;
 import com.openclassrooms.payMyBuddy.repository.UserRepository;
 import com.openclassrooms.payMyBuddy.service.TransactionService;
@@ -125,7 +126,10 @@ public class TransactionServiceImpl implements TransactionService {
                 .collect(Collectors.toList());
     }
 
-
+    @Override
+    public List<UserConnexionModel> getUserConnectionModel() {
+        return null;
+    }
 
 
 }
