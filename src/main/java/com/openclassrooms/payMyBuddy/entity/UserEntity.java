@@ -9,6 +9,7 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 @Entity
@@ -29,8 +30,8 @@ public class UserEntity {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = true)
-    private Double sold;
+    @Column(nullable = false, columnDefinition = "DOUBLE DEFAULT 0.0")
+    private Double sold = 0.0;
 
     @OneToMany
     @JsonBackReference

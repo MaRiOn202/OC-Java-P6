@@ -1,6 +1,6 @@
 package com.openclassrooms.payMyBuddy.service;
 
-import com.openclassrooms.payMyBuddy.model.UserConnexionModel;
+import com.openclassrooms.payMyBuddy.model.UserConnectionModel;
 import com.openclassrooms.payMyBuddy.model.UserModel;
 import jakarta.validation.Valid;
 
@@ -27,6 +27,6 @@ public interface UserService {
     UserModel getConnectingUser() throws Exception;
 
     // ajouter les connexions userconnexionModel
-    void addRelation(@Valid UserConnexionModel userModel) throws Exception;
+    void addRelation(@Valid UserConnectionModel userModel) throws Exception;
 
 }

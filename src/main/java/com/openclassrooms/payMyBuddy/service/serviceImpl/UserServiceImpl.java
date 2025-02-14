@@ -4,7 +4,7 @@ import com.openclassrooms.payMyBuddy.entity.UserEntity;
 import com.openclassrooms.payMyBuddy.exception.UserNotConnectedException;
 import com.openclassrooms.payMyBuddy.exception.UserNotFoundException;
 import com.openclassrooms.payMyBuddy.mapper.UserMapper;
-import com.openclassrooms.payMyBuddy.model.UserConnexionModel;
+import com.openclassrooms.payMyBuddy.model.UserConnectionModel;
 import com.openclassrooms.payMyBuddy.model.UserModel;
 import com.openclassrooms.payMyBuddy.repository.UserRepository;
 import com.openclassrooms.payMyBuddy.service.UserService;
@@ -94,12 +94,14 @@ public class UserServiceImpl implements UserService {
         }*/
         userModel.setPassword(passwordEncoder.encode(userModel.getPassword()));
         UserEntity userEntity = userMapper.mapToUserEntity(userModel);
-        log.info("User à sauvegarder: {}", userEntity);
+        log.info("User à sauvegarder après mapping: Email={}, Username={}", userEntity.getEmail(), userEntity.getUsername());
 
+        log.info("Avant sauvegarde: Email={}, Username={}", userEntity.getEmail(), userEntity.getUsername());
         userEntity = userRepository.save(userEntity);
         log.info("User a bien été sauvegardé victoire ! : {}", userEntity);
 
         UserModel savedUser = userMapper.mapToUserModel(userEntity);
+        log.info("Utilisateur final retournée : Email={}, Username={}", savedUser.getEmail(), savedUser.getUsername());
         log.info("L'utilisateur a bien été ajouté.");
         return savedUser;
 
@@ -114,15 +116,23 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("L'email est obligatoire.");
         }
 
-        // 2  a) si l'user non trouvé b) ok
+        // 2  a) si l'user non trouvé b) si ok charger user
         UserEntity existingUser = userRepository.findByEmail(userModel.getEmail());
         if (existingUser == null) {
             log.error("Aucun utilisateur n'a été trouvé avec l'email : " + userModel.getEmail());
             throw new UserNotFoundException("Utilisateur non trouvé.");
         }
 
+        // pb Id
+        if (existingUser.getId() == null) {
+            throw new IllegalArgumentException("L'Id du user ne peut pas être null");
+        }
+
         // Traitement des données
-        userMapper.updateUserEntityFromModel(userModel, existingUser);
+        // Mapper à la main les champs qui peuvent être modifiés
+        existingUser.setUsername(userModel.getUsername());
+        existingUser.setPassword(userModel.getPassword());
+        existingUser.setSold(userModel.getSold());
 
         if (userModel.getPassword() != null && !userModel.getPassword().isEmpty()) {
             existingUser.setPassword(passwordEncoder.encode(userModel.getPassword()));
@@ -156,9 +166,11 @@ public class UserServiceImpl implements UserService {
           log.error("Aucun utilisateur n'a été trouvé avec l'email : " + email);
           throw new UserNotFoundException("Utilisateur non trouvé avec l'eamil : " + email);
         }
+
         // 3
         UserModel userModel = userMapper.mapToUserModel(userEntity);
-        log.info("L'utilisateur a été récupéré avec succès : {} ", userModel.getEmail());
+        log.info("L'email de l'utilisateur a été récupéré avec succès : {} ", userModel.getEmail());
+        log.info("L'Id de l'utilisateur a été récupéré avec succès : {} ", userModel.getId());
         return userModel;
     }
 
@@ -173,17 +185,17 @@ public class UserServiceImpl implements UserService {
    // ajouter les connexions userconnexionModel
     @Override
     @Transactional
-    public void addRelation(UserConnexionModel userConnexionModel) throws Exception {
+    public void addRelation(UserConnectionModel userConnectionModel) throws Exception {
         UserModel userModelConnected = getConnectingUser();
         UserEntity userEntityConnected = userRepository.findByEmail(userModelConnected.getEmail());
 
-        if (userEntityConnected.getEmail().equals(userConnexionModel.getEmail())) {
+        if (userEntityConnected.getEmail().equals(userConnectionModel.getEmail())) {
             throw new Exception("Vous ne pouvez pas ajouter votre propre email comme relation");
         }
 
-        UserEntity newRelation = userRepository.findByEmail(userConnexionModel.getEmail());
+        UserEntity newRelation = userRepository.findByEmail(userConnectionModel.getEmail());
         if (newRelation == null) {
-            log.error("Aucun utilisateur n'a été trouvé avec l'email : " + userConnexionModel.getEmail());
+            log.error("Aucun utilisateur n'a été trouvé avec l'email : " + userConnectionModel.getEmail());
             throw new UserNotFoundException("Utilisateur non trouvé en base de données.");
         }
 
@@ -191,14 +203,20 @@ public class UserServiceImpl implements UserService {
         if (userEntityConnected.getConnections() == null) {
            userEntityConnected.setConnections(new ArrayList<>());
         }
+        if (newRelation.getConnections() == null) {
+           newRelation.setConnections(new ArrayList<>());
+        }
 
-        if (!userEntityConnected.getConnections().contains(newRelation)) {
+        if (!userEntityConnected.getConnections().contains(newRelation)
+                && !newRelation.getConnections().contains(userEntityConnected)) {
             userEntityConnected.getConnections().add(newRelation);
+            newRelation.getConnections().add(userEntityConnected);    // relation bidirectionnelle
             log.info("Récupération de l'utilisateur ocnnecté : {}", userEntityConnected.getEmail());
             log.info("Ajout de la relation  : {}", newRelation.getEmail());
             log.info("Ajout de la relation entre {} et {}", userEntityConnected.getEmail(),
                     newRelation.getEmail());
-            userRepository.save(userEntityConnected);       //persister la relation
+            userRepository.save(userEntityConnected);
+            userRepository.save(newRelation);     //persister la relation
         } else {
             log.error("La relation existe déjà");
             throw new Exception("La relation existe déjà");

@@ -50,8 +50,8 @@
     <div class="alert alert-info text-center">Le transfert a été effectué avec succès ! </div>
 </div>
 
-<div th:if="${param.error}">
-    <div class="alert alert-info text-center">Le transfert n'a pas pu s'effectuer, veuillez recommencer. </div>
+<div th:if="${error}" class="alert alert-danger text-center">
+    <span th:text="${error}"></span>
 </div>
 
 
@@ -75,9 +75,11 @@
         <form th:action="@{/transfert/save}" th:object="${transactionModel}" method="post" class="mb-4" style="padding: 3%;">
                 <div class="row mb-3">
                     <div class="col-md-4">
-                        <select name="relation" class="form-select" required>
+                        <select name="receiver" class="form-select" required>
                             <option value="" disabled selected>Sélectionner une relation</option>
-                            <option th:each="relation : ${receiver}" th:value="${relation}" th:text="${relation}"></option>
+                            <option th:each="relation : ${relations}"
+                                    th:value="${relation.friends[0].email}"
+                                    th:text="${relation.friends[0].username}"></option>
                         </select>
                     </div>
 
@@ -95,7 +97,7 @@
                 </div>
         </form>
 
-        
+        <!-- Mes Transactions -->
         <div class="mb-4">
             <h6 class="text-center mb-4" style="font-weight: bold;">Mes Transactions :</h6>
                 <table class="table table-bordered" style="width: 100%;">

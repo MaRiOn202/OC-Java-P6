@@ -66,7 +66,7 @@
         </div>
 
         <!-- form -->
-        <form th:action="@{/relation/save}" method="post" th:object="${userConnexionModel}">
+        <form th:action="@{/relation/save}" method="post" th:object="${userConnectionModel}">
             <div class="mb-4">
                 <label for="email" style="font-weight: bold;">Chercher une relation :</label>
                 <input type="email" class="form-control" id="email" th:field="*{email}" placeholder="Saisir une adresse mail" required>

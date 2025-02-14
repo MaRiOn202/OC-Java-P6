@@ -1,7 +1,8 @@
 package com.openclassrooms.payMyBuddy.controller;
 
 import com.openclassrooms.payMyBuddy.exception.UserNotFoundException;
-import com.openclassrooms.payMyBuddy.model.UserConnexionModel;
+import com.openclassrooms.payMyBuddy.model.UserConnectionModel;
+import com.openclassrooms.payMyBuddy.model.UserLoginModel;
 import com.openclassrooms.payMyBuddy.model.UserModel;
 import com.openclassrooms.payMyBuddy.service.UserService;
 import jakarta.validation.Valid;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 
@@ -39,8 +41,8 @@ public class UserController {
         if (principal != null) {
          return "redirect:/home";
         }
-       UserModel userModel = new UserModel();       // model vide
-       model.addAttribute("userModel", userModel);
+       UserLoginModel userLoginModel = new UserLoginModel();       // model vide
+       model.addAttribute("userLoginModel", userLoginModel);
        model.addAttribute("success", "Connexion réussie !");
         return "login";
     }
@@ -74,7 +76,7 @@ public class UserController {
            model.addAttribute("userModel", userModel);
 
            // champs affichés en mode lecture
-           model.addAttribute("isOk", false);   // false  donc en mode modif
+           model.addAttribute("isOk", false);   // false  donc lecture
        } catch (Exception e)   {
            log.error("Erreur remontée lors du chargement page profile : {}", e.getMessage());
           model.addAttribute("error", "Une erreur s'est produite lors du chargement");
@@ -85,11 +87,11 @@ public class UserController {
     }
 
     @PostMapping("/profile/toChange")
-    public String toChangeInformations(boolean isOk, Model model) throws Exception {
+    public String toChangeInformations(Boolean isOk, Model model) throws Exception {
        UserModel userModel = userService.getConnectingUser();
-       log.info("accès vers profile/toChangeInforamtions effectué");
+       log.info("accès vers profile/toChangeInformation effectué");
        model.addAttribute("userModel", userModel);
-       model.addAttribute("isOk", !isOk); // inversion de l'état donc modif à effectuer
+       model.addAttribute("isOk", isOk != null && !isOk); // inversion de l'état donc modif à effectuer
        return "profile";
     }
 
@@ -97,44 +99,48 @@ public class UserController {
     public String updateProfil(@Valid UserModel userModel, BindingResult result, Model model) throws Exception {
        log.info("accès vers profile/update effectué");
        if (result.hasErrors()) {
-          model.addAttribute("error", "error de valiudation");
+          //model.addAttribute("error", "error de valiudation");
            model.addAttribute("userModel", userModel);
            return "profile";
        }
-
+        log.info("UserModel : {}", userModel);
        userService.updateUser(userModel);
        model.addAttribute("userModel", userModel);
        model.addAttribute("isOk", false);
        model.addAttribute("success", "Les modifications ont été enregistrées avec succès !");
         return "redirect:/profile?success";
+        
+        //redirectAttributes.addFlashAttribute("success", "Modifications enregistrées avec succès !");   RedirectAttributes redirectAttributes
+        //return "redirect:/profile";
     }
 
     @GetMapping("/relation")
     public String accessToRelationForm(Model model) {
 
-       UserConnexionModel userConnexionModel = new UserConnexionModel();
-       model.addAttribute("userConnexionModel", userConnexionModel);
+       UserConnectionModel userConnectionModel = new UserConnectionModel();
+       model.addAttribute("userConnectionModel", userConnectionModel);
        return "relation";
 
     }
 
     @PostMapping("/relation/save")
-    public String addRelation(@Valid UserConnexionModel userConnexionModel, BindingResult result, Model model) throws Exception {
+    public String addRelation(@Valid UserConnectionModel userConnectionModel, BindingResult result, Model model) throws Exception {
 
       if (result.hasErrors()) {
-          model.addAttribute("userConnexionModel", userConnexionModel);
+          model.addAttribute("userConnectionModel", userConnectionModel);
+          model.addAttribute("error", "Erreur de validation");
           return "relation";     //vue
       }
 
       try {
-          userService.addRelation(userConnexionModel);
+          userService.addRelation(userConnectionModel);
       } catch (UserNotFoundException e)  {
           result.rejectValue("email", "error.emailNotFound", "Utilisateur non trouvé en bdd"); //form de vue relation + message error
-          model.addAttribute("userConnexionModel", userConnexionModel);
+          model.addAttribute("userConnectionModel", userConnectionModel);
           return "relation";
         } catch (Exception e) {
             result.rejectValue("email", "error.email", e.getMessage()); //exception générée dans serviceImpl
-            model.addAttribute("userConnexionModel", userConnexionModel);
+            model.addAttribute("userConnectionModel", userConnectionModel);
             return "relation";
       }
 
