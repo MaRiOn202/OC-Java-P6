@@ -1,5 +1,6 @@
 package com.openclassrooms.payMyBuddy.controller;
 
+
 import com.openclassrooms.payMyBuddy.exception.UserNotFoundException;
 import com.openclassrooms.payMyBuddy.model.UserConnectionModel;
 import com.openclassrooms.payMyBuddy.model.UserLoginModel;
@@ -10,13 +11,15 @@ import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
+import java.util.List;
 
 
 @Controller
@@ -37,11 +40,20 @@ public class UserController {
     @GetMapping("/login")
     public String login(Model model, Principal principal) {
 
-       // Redirection si déjà connecté
+        // Redirection si déjà connecté
         if (principal != null) {
-         return "redirect:/home";
+            return "redirect:/home";
         }
-       UserLoginModel userLoginModel = new UserLoginModel();       // model vide
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+             log.info("User est authentifié : {}", authentication.getName());
+        } else {
+            log.info("Controller : User non authentifié");
+        }
+
+             // model vide
+       UserLoginModel userLoginModel = new UserLoginModel();
        model.addAttribute("userLoginModel", userLoginModel);
        model.addAttribute("success", "Connexion réussie !");
         return "login";
@@ -109,13 +121,15 @@ public class UserController {
        model.addAttribute("isOk", false);
        model.addAttribute("success", "Les modifications ont été enregistrées avec succès !");
         return "redirect:/profile?success";
-        
-        //redirectAttributes.addFlashAttribute("success", "Modifications enregistrées avec succès !");   RedirectAttributes redirectAttributes
-        //return "redirect:/profile";
+
     }
 
     @GetMapping("/relation")
-    public String accessToRelationForm(Model model) {
+    public String accessToRelationForm(Model model, Principal principal) {
+        if (principal == null) {
+            log.info("redirection vers la page login car not utilisateur connecté");
+            return "redirect:/login";
+        }
 
        UserConnectionModel userConnectionModel = new UserConnectionModel();
        model.addAttribute("userConnectionModel", userConnectionModel);
@@ -133,7 +147,8 @@ public class UserController {
       }
 
       try {
-          userService.addRelation(userConnectionModel);
+          List<UserModel> listUserEntity = userService.addRelation(userConnectionModel.getEmail());
+          userConnectionModel.setFriends(listUserEntity);
       } catch (UserNotFoundException e)  {
           result.rejectValue("email", "error.emailNotFound", "Utilisateur non trouvé en bdd"); //form de vue relation + message error
           model.addAttribute("userConnectionModel", userConnectionModel);

@@ -58,7 +58,7 @@
 <!-- container princ  -->
 <div class="d-flex justify-content-center align-items-center vh-100">
 
-    <div class="card shadow-sm p-4" style="width: 800px;height: 500px;">
+    <div class="card shadow-sm p-4" style="width: 800px;height: 600px;">
 
         <div class="text-center mb-4">
             <a href="#" th:href="@{/home}" class="btn btn-warning text-white fw-bold"
@@ -77,9 +77,9 @@
                     <div class="col-md-4">
                         <select name="receiver" class="form-select" required>
                             <option value="" disabled selected>Sélectionner une relation</option>
-                            <option th:each="relation : ${relations}"
-                                    th:value="${relation.friends[0].email}"
-                                    th:text="${relation.friends[0].username}"></option>
+                            <option th:each="friend : ${relations.friends}"
+                                    th:text="${friend.username}"
+                                    th:value="${friend.email}"></option>
                         </select>
                     </div>
 
@@ -88,7 +88,8 @@
                     </div>
 
                     <div class="col-md-2">
-                        <input type="number" th:field="*{amount}" class="form-control" placeholder="0€" min="0" step="0.01" required>
+                        <input class="form-control" min="0.0" placeholder="0€" required step="0.00"
+                               th:field="*{amount}" type="number">
                     </div>
 
                     <div class="col-md-2">
@@ -109,17 +110,36 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="transaction : ${transactions} ">
-                        <td th:text="${transaction.receiver}"></td>
-                        <td th:text="${transaction.description}"></td>
-                        <td th:text="${transaction.amount}"></td>
-                    </tr>
+                        <tr th:each="transaction : ${transactions}">
+                            <td>
+                                <span th:text="${transaction.sender == userModel.email ? 'Envoyé à ' + transaction.receiverName : 'Reçu de ' + transaction.senderName}"></span>
+                            </td>
+                            <td th:text="${transaction.description}"></td>
+                            <td>
+                                <span th:style="${transaction.sender == userModel.email ? 'color: red;' : 'color: green;'}">
+                                <span th:text="${transaction.sender == userModel.email ? '-' : '+'}"></span>
+                                <span th:text="${transaction.amount}"></span>€</span>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
 
-<!--            <div class="text-center mb-4">
-                <a href="#" th:href="@{/home}" class="btn btn-secondary">Retour à l'accueil</a>
-            </div>-->
+            <!-- Pagination -->
+            <nav>
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:if="${currentPage > 0 }">
+                        <a class="page-link" th:href="@{/transfert(page=${currentPage - 1}, size=5)}">Précédent</a>
+                    </li>
+
+                    <li class="page-item" th:if="${currentPage + 1 < totalPages }">
+                        <a class="page-link" th:href="@{/transfert(page=${currentPage + 1}, size=5)}">Suivant</a>
+                    </li>
+                </ul>
+            </nav>
+
+            <!--            <div class="text-center mb-4">
+                            <a href="#" th:href="@{/home}" class="btn btn-secondary">Retour à l'accueil</a>
+                        </div>-->
                 
         </div>
 

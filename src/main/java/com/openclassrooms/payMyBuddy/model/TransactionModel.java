@@ -25,6 +25,10 @@ public class TransactionModel {
 //    @NotBlank(message = "La description est obligatoire")
     private String description;
 
+    private String senderName;
+    //    @NotBlank(message = "Le nom du destinataire est obligatoire")
+    private String receiverName;
+
     @NotNull(message = "Le montant ne peut pas être nul")
     @Min(value=1, message = "Le montant doit être supérieur à 0")
     private Double amount;

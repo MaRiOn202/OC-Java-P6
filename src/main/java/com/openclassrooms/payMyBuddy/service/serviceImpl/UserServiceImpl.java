@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -88,10 +89,10 @@ public class UserServiceImpl implements UserService {
         // Construire les réponses à renvoyer à l'utilisateur
         log.info("Tentative de création d'un user avec l'email: {}", userModel.getEmail());
 
-/*        if (userModel.getEmail() != null) {
-            log.info("User existe déjà : {}", userModel.getEmail());
-            throw new EmailAlreadyExistingException("Cet email est déjà utilisé.");
+ /*       if (userModel.getSold() == null) {
+           userModel.setSold(0.0);
         }*/
+
         userModel.setPassword(passwordEncoder.encode(userModel.getPassword()));
         UserEntity userEntity = userMapper.mapToUserEntity(userModel);
         log.info("User à sauvegarder après mapping: Email={}, Username={}", userEntity.getEmail(), userEntity.getUsername());
@@ -153,14 +154,19 @@ public class UserServiceImpl implements UserService {
     public UserModel getConnectingUser() throws UserNotFoundException, UserNotConnectedException {
         // 1
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();  // contexte de sécurité pour récupérer le user connecté
-        log.info("Utilisateur authentifié : {}", authentication);
+        log.info("Utilisateur authentifié après connexion : {}", authentication);
         
         if(authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getName())) {
-            log.error("L'utilisateur n'est pas connecté !");
+            log.error("L'utilisateur n'est pas connecté ! Authentication : {} ", authentication);
             throw new UserNotConnectedException("Utilisateur non connecté.");
         }
+
+        log.info("User identifié : {}", authentication.getPrincipal());
+
         // 2
         String email = authentication.getName();
+        log.info("Email récupéré depuis l'authentication : {}", email);
+
         UserEntity userEntity = userRepository.findByEmail(email);
         if(userEntity== null) {
           log.error("Aucun utilisateur n'a été trouvé avec l'email : " + email);
@@ -183,45 +189,68 @@ public class UserServiceImpl implements UserService {
     }
 
    // ajouter les connexions userconnexionModel
-    @Override
     @Transactional
-    public void addRelation(UserConnectionModel userConnectionModel) throws Exception {
+    public List<UserModel> addRelation(String emailFriend) throws Exception {
         UserModel userModelConnected = getConnectingUser();
+
+        UserEntity newRelation = userRepository.findByEmail(emailFriend);
         UserEntity userEntityConnected = userRepository.findByEmail(userModelConnected.getEmail());
-
-        if (userEntityConnected.getEmail().equals(userConnectionModel.getEmail())) {
-            throw new Exception("Vous ne pouvez pas ajouter votre propre email comme relation");
-        }
-
-        UserEntity newRelation = userRepository.findByEmail(userConnectionModel.getEmail());
         if (newRelation == null) {
-            log.error("Aucun utilisateur n'a été trouvé avec l'email : " + userConnectionModel.getEmail());
+            log.error("Aucun utilisateur n'a été trouvé avec l'email : " + emailFriend);
             throw new UserNotFoundException("Utilisateur non trouvé en base de données.");
         }
+        
 
-        // Initialiser liste si null
-        if (userEntityConnected.getConnections() == null) {
-           userEntityConnected.setConnections(new ArrayList<>());
-        }
-        if (newRelation.getConnections() == null) {
-           newRelation.setConnections(new ArrayList<>());
-        }
-
-        if (!userEntityConnected.getConnections().contains(newRelation)
-                && !newRelation.getConnections().contains(userEntityConnected)) {
+        if (!userEntityConnected.getConnections().contains(newRelation)) {
             userEntityConnected.getConnections().add(newRelation);
             newRelation.getConnections().add(userEntityConnected);    // relation bidirectionnelle
-            log.info("Récupération de l'utilisateur ocnnecté : {}", userEntityConnected.getEmail());
+            log.info("Récupération de l'utilisateur connecté : {}", userEntityConnected.getEmail());
             log.info("Ajout de la relation  : {}", newRelation.getEmail());
             log.info("Ajout de la relation entre {} et {}", userEntityConnected.getEmail(),
                     newRelation.getEmail());
-            userRepository.save(userEntityConnected);
-            userRepository.save(newRelation);     //persister la relation
+            //userRepository.save(userEntityConnected);
+
+            userEntityConnected = userRepository.save(userEntityConnected);
+            userRepository.save(newRelation);
+            //persister la relation
         } else {
             log.error("La relation existe déjà");
             throw new Exception("La relation existe déjà");
         }
+        return userEntityConnected.getConnections()
+                .stream()
+                .map(userMapper::mapToUserModel)
+                .collect(Collectors.toList());
+    }
 
+    @Override
+    public UserConnectionModel getUserConnectionModel(Long id) {
+
+        // 1. user connecté par id
+        Optional<UserEntity> optionalUserEntity = userRepository.findById(id);
+
+        if (optionalUserEntity.isEmpty()) {
+            throw new UserNotFoundException("Utilisateur non toruvé avec l'id : " + id);
+        }
+
+        UserEntity userEntity = optionalUserEntity.get();
+
+        // 2. user friends ctd les connections
+        List<UserEntity> friends = userEntity.getConnections(); // car userEntity
+        if (friends.isEmpty()) {
+            log.info("Aucune relation trouvée pour : {}", userEntity.getEmail());
+        }
+
+
+        // 3. List de UserConnectionModel
+        UserConnectionModel userConnectionModel = new UserConnectionModel();
+        userConnectionModel.setFriends(new ArrayList<>());
+        for (UserEntity friendUserEntity : friends) {
+            UserModel userModel = userMapper.mapToUserModel(friendUserEntity);
+            userConnectionModel.getFriends().add(userModel);
+        }
+        log.info("Relations récupérées pour user {}: {}", userEntity.getEmail(), userConnectionModel.getFriends());
+        return userConnectionModel;
     }
 
 }

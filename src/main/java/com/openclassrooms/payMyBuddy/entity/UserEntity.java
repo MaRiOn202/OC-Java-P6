@@ -1,6 +1,7 @@
 package com.openclassrooms.payMyBuddy.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -30,28 +31,32 @@ public class UserEntity {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false, columnDefinition = "DOUBLE DEFAULT 0.0")
+    @Column(nullable = false, columnDefinition = "DOUBLE DEFAULT 0.0", insertable = false)
     private Double sold = 0.0;
 
-    @OneToMany
-    @JsonBackReference
+    @ManyToMany
+    @JoinTable(
+            name = "users_connections",
+            joinColumns = @JoinColumn(name = "user_entity_id"),
+            inverseJoinColumns = @JoinColumn(name = "connections_id")
+    )
+    @JsonManagedReference
     private List<UserEntity> connections;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     @JsonBackReference
     private List<TransactionEntity> transactions;
 
-
     @Override
     public String toString() {
-        return "User{" +
+        return "UserEntity{" +
                 "id=" + id +
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
+                ", sold=" + sold +
                 ", connections=" + connections +
                 ", transactions=" + transactions +
                 '}';
     }
-
 }

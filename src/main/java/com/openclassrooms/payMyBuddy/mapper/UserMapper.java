@@ -18,11 +18,7 @@ public interface UserMapper {
 
     UserEntity mapUCMToUserEntity(UserConnectionModel userConnectionModel);
     UserConnectionModel mapToUserConnexionModel(UserEntity userEntity);
-
-
-    // Méthode de mise à jour (cas particulier)
-    //void updateUserEntityFromModel(UserModel userModel, @MappingTarget UserEntity userEntity);
-
+    
 
     // Permet de cp les propriétés d'un obj UM ds un obj UE
     @Mapping(target = "password", ignore = true)     // ne mappe pas le password sécu

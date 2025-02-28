@@ -11,12 +11,18 @@ import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import java.security.Principal;
 import java.util.Comparator;
 import java.util.List;
 
@@ -32,9 +38,18 @@ public class TransactionController {
 
     private static final Logger log = LoggerFactory.getLogger(TransactionController.class);
 
-
+                                                                             
     @GetMapping("/transfert")
-    public String accessToTransactionForm(Model model) throws Exception {
+    public String accessToTransactionForm(Model model,
+                @RequestParam(defaultValue = "0") int page,
+                @RequestParam(defaultValue = "5") int nberOfOccurrences, Principal principal)
+            throws Exception {
+
+        if (principal == null) {
+            log.info("transfertController : redirection vers la page login car not utilisateur connecté");
+            return "redirect:/login";
+        }
+
         // Verif user connecté
         UserModel userModel = userService.getConnectingUser();
         log.info("accès vers /transfert utilisateur : {} ", userModel.getEmail());
@@ -42,18 +57,22 @@ public class TransactionController {
         if (userModel.getId() == null) {
             throw new IllegalArgumentException("L'Id de l'utilisateur ne peut pas être nul");
         }
-       // récupère les transactions
-       List<TransactionModel> listUserTransactions = transactionService.getTransactionsByUser(userModel.getEmail());
-       listUserTransactions.sort(Comparator.comparing(TransactionModel::getId).reversed()); // tri transaction ordre décroissant
-       List<UserConnectionModel> listUserConnections = transactionService.getUserConnectionModel(userModel.getId());
+
+       Pageable pageable = PageRequest.of(page, nberOfOccurrences, Sort.by("localDateTime").descending());
+       Page<TransactionModel> transactionsPage = transactionService.getTransactionsByUser(userModel.getEmail(), pageable);
+       UserConnectionModel listUserConnections = userService.getUserConnectionModel(userModel.getId());
        
        // Ajout != données au model
        model.addAttribute("userModel", userModel);
-       model.addAttribute("transactions", listUserTransactions);
+       model.addAttribute("transactions", transactionsPage.getContent());
+        model.addAttribute("currentPage", transactionsPage.getNumber());
+        model.addAttribute("totalPages", transactionsPage.getTotalPages());
        model.addAttribute("transactionModel", new TransactionModel());
        model.addAttribute("relations", listUserConnections);
        return "transfert";
     }
+
+    
 
 
     @PostMapping("/transfert/save")
@@ -70,15 +89,17 @@ public class TransactionController {
            transactionService.createTransaction(transactionModel);
            // récupréer transactions de l'utilisateur connecté mis à jour
             UserModel userModel = userService.getConnectingUser();
-            // cf méthode ci dessus
-            List<TransactionModel> listUserTransactions = transactionService.getTransactionsByUser(userModel.getEmail());
-            listUserTransactions.sort(Comparator.comparing(TransactionModel::getId).reversed());
+
+            Pageable pageable = PageRequest.of(0, 5, Sort.by("localDateTime").descending());
+            Page<TransactionModel> transactionsPage = transactionService.getTransactionsByUser(userModel.getEmail(), pageable);
 
             // Ajout != données au model
             model.addAttribute("userModel", userModel);
-            model.addAttribute("transactions", listUserTransactions);
+            model.addAttribute("transactions", transactionsPage.getContent());
+            model.addAttribute("currentPage", transactionsPage.getNumber());
+            model.addAttribute("totalPages", transactionsPage.getTotalPages());
             model.addAttribute("transactionModel", new TransactionModel());
-            model.addAttribute("relations", transactionService.getUserConnectionModel(userModel.getId())); // formulaire de relation à jour
+            model.addAttribute("relations", userService.getUserConnectionModel(userModel.getId())); // formulaire de relation à jour
 
             model.addAttribute("success", "Le transfert a bien été effectué !");
             return "transfert";

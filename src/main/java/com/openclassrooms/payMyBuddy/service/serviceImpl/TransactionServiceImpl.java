@@ -8,8 +8,6 @@ import com.openclassrooms.payMyBuddy.exception.UserNotFoundException;
 import com.openclassrooms.payMyBuddy.mapper.TransactionMapper;
 import com.openclassrooms.payMyBuddy.mapper.UserMapper;
 import com.openclassrooms.payMyBuddy.model.TransactionModel;
-import com.openclassrooms.payMyBuddy.model.UserConnectionModel;
-import com.openclassrooms.payMyBuddy.model.UserModel;
 import com.openclassrooms.payMyBuddy.repository.TransactionRepository;
 import com.openclassrooms.payMyBuddy.repository.UserRepository;
 import com.openclassrooms.payMyBuddy.service.TransactionService;
@@ -17,6 +15,8 @@ import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -100,6 +100,7 @@ public class TransactionServiceImpl implements TransactionService {
         double totalMontant = transactionModel.getAmount() + commission;
 
         sender.setSold(sender.getSold() - totalMontant);      // solde - totalMontant
+        log.info("Sold du sender : {} - totalMontant : {} (total commission : {} )", sender.getSold(), totalMontant, commission);
         receiver.setSold(receiver.getSold() + transactionModel.getAmount()); // amount ss commission
         TransactionEntity transactionEntity = transactionMapper.mapToTransactionEntity(transactionModel);
         transactionEntity.setSender(sender);
@@ -131,50 +132,19 @@ public class TransactionServiceImpl implements TransactionService {
 
 
     @Override
-    public List<TransactionModel> getTransactionsByUser(String emailUser) {
+    public Page<TransactionModel> getTransactionsByUser(String emailUser, Pageable pageable) {
 
-        UserEntity userEntity = userRepository.findByEmail(emailUser);
+        UserEntity userConnected = userRepository.findByEmail(emailUser);
+        if (userConnected == null) {
+            log.error("Aucun utilisateur n'a été trouvé avec l'email : " + emailUser);
+            throw new UserNotFoundException("Utilisateur non trouvé : " + emailUser);
+        }
+        // transactions du user connected
+        Page<TransactionEntity> transactionEntityPage = transactionRepository.findBySenderOrReceiver(userConnected, userConnected, pageable);
 
-        List<TransactionEntity> transactions = transactionRepository.findBySenderAndReceiver(userEntity, userEntity);
-        return transactions.stream()
-                .map(transactionMapper::mapToTransactionModel)  // appel mapper pour chaque ligne
-                .collect(Collectors.toList());
+        return transactionEntityPage.map(transactionMapper::mapToTransactionModel);
     }
 
-
-    @Override
-    public List<UserConnectionModel> getUserConnectionModel(Long id) {
-
-        // 1. user connecté par id
-        Optional<UserEntity> optionalUserEntity = userRepository.findById(id);
-
-        if (optionalUserEntity.isEmpty()) {
-            throw new UserNotFoundException("Utilisateur non toruvé avec l'id : " + id);
-        }
-
-        UserEntity userEntity = optionalUserEntity.get();
-
-        // 2. user friends ctd les connections
-        List<UserEntity> friends = userEntity.getConnections(); // car userEntity
-        if (friends.isEmpty()) {
-           log.info("Aucune relation trouvée pour : {}", userEntity.getEmail());
-        }
-        
-
-        // 3. List de UserConnectionModel
-        List<UserConnectionModel> listUserConnectionModel = new ArrayList<>();
-
-        for (UserEntity friendUserEntity : friends) {
-            UserModel userModel = userMapper.mapToUserModel(friendUserEntity);
-            listUserConnectionModel.add(
-                    new UserConnectionModel(
-                       List.of(userModel), friendUserEntity.getEmail()        // champs dans UCModel
-                    )
-            );
-        }
-        log.info("Relations récupérées pour user {}: {}", userEntity.getEmail(), friends);
-        return listUserConnectionModel;
-    }
 
 
 }

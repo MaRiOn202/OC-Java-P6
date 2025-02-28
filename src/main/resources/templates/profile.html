@@ -97,23 +97,25 @@
         <!-- Form -->
         <form th:if="${isOk}" th:action="@{/profile/update}" method="post" th:object="${userModel}">
 
-            <!-- mode modif -->
+            <!-- mode edition -->
                 <div class="mb-4">
                     <label for="username" class="form-label fw-bold mb-0">Username : </label>
                     <input type="text" id="username" th:field="*{username}" class="form-control">
                 </div>
-            <div class="mb-4">
+            <div class="mb-4">                                                                             
                 <label for="email" class="form-label fw-bold mb-0">Email : </label>
                 <input type="email" id="email" th:field="*{email}" class="form-control" th:if="isOk">
             </div>
             <div class="mb-4">
                 <label for="password" class="form-label fw-bold mb-0">Password : </label>
-                <input type="password" id="password" th:field="*{password}" class="form-control"
-                       th:value="${userModel.password != null ? userModel.password : ''}">
+                <input type="password" id="password" name="password" class="form-control"
+                       th:value="${userModel.password}"
+                       th:readonly="${isOk}"
+                       onfocus="this.removeAttribute('readonly'); this.value='';">
             </div>
             <div class="mb-4">
                 <label for="sold" class="form-label fw-bold mb-0">Solde : </label>
-                <input type="number" id="sold" th:field="*{sold}" class="form-control">
+                <input type="number" id="sold" th:field="*{sold}" class="form-control" step="0.01" min="0" value="0" placeholder="0.0€">
             </div>
                 <button type="submit" class="btn btn-primary">Enregistrer</button>
         </form>

@@ -76,17 +76,11 @@
             <div class="mb-4">
                 <label for="email" class="form-label visually-hidden">Mail</label>
                 <input type="email" class="form-control" id="email" name="email" th:field="*{email}" placeholder="Mail" required>
-<!--                <div th:if="${#fields.hasErrors('email')}" class="text-danger">
-                    <span th:errors="*{email}"></span>
-                </div>-->
             </div>
             <!-- Champ mot de passe -->
             <div class="mb-4">
                 <label for="password" class="form-label visually-hidden">Mot de passe</label>
-                <input type="password" class="form-control" id="password" th:field="*{password}" placeholder="Mot de passe" required>
-<!--                <div th:if="${#fields.hasErrors('password')}" class="text-danger">
-                    <span th:errors="*{password}"></span>
-                </div>-->
+                <input type="password" class="form-control" id="password" name="password" th:field="*{password}" placeholder="Mot de passe" required>
             </div>
             <!-- Bouton Se connecter -->
             <div class="form-group text-center mb-4">
