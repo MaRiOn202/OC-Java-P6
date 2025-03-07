@@ -150,7 +150,7 @@ public class UserServiceImpl implements UserService {
     // Validation des données d'entrée
     //Traiter les données
     // Construire les réponses à renvoyer à l'utilisateur
-    @Override
+    @Override                        
     public UserModel getConnectingUser() throws UserNotFoundException, UserNotConnectedException {
         // 1
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();  // contexte de sécurité pour récupérer le user connecté

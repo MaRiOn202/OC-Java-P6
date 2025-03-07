@@ -55,13 +55,7 @@ public class RegisterController {
         //renvoyer page home ?
     }                                              
 
-
-/*    @GetMapping("/users")
-    public String users(Model model) throws Exception {
-        List<UserModel> listUsersModel = userService.findAllUsers();
-        model.addAttribute("users", listUsersModel);
-        return "users";
-    }*/
+    
 
 
 }

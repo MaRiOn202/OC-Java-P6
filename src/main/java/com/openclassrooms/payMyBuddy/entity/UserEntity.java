@@ -5,8 +5,10 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
 
 import java.util.List;
+import java.util.Objects;
 
 @Data
 @NoArgsConstructor
@@ -34,6 +36,9 @@ public class UserEntity {
     @Column(nullable = false, columnDefinition = "DOUBLE DEFAULT 0.0", insertable = false)
     private Double sold = 0.0;
 
+    @Column(name = "role", nullable = false)
+    private String role = "USER";
+
     @ManyToMany
     @JoinTable(
             name = "users_connections",
@@ -47,6 +52,7 @@ public class UserEntity {
     @JsonBackReference
     private List<TransactionEntity> transactions;
 
+
     @Override
     public String toString() {
         return "UserEntity{" +
@@ -55,6 +61,7 @@ public class UserEntity {
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", sold=" + sold +
+                ", role='" + role + '\'' +
                 ", connections=" + connections +
                 ", transactions=" + transactions +
                 '}';

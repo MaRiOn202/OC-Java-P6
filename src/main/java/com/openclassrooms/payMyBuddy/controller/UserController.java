@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -32,29 +33,58 @@ public class UserController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
 
+    @GetMapping("/check-auth")
+    public ResponseEntity<String> checkAuth() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        log.info("Utilisateur dans SecurityContext: {}", authentication.getPrincipal());
+        return ResponseEntity.ok("Utilisateur dans SecurityCOntext : " + authentication.getPrincipal());
+    }
+
+
+
    @GetMapping("home")
     public String home() {
+       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+           log.info("User après connexion : {}", authentication.getName());
         return "home";
     }
 
     @GetMapping("/login")
-    public String login(Model model, Principal principal) {
+    public String login(Model model) {
+        model.addAttribute("userLoginModel", new UserLoginModel());
+        return "login";
+    }
+
+    @PostMapping("/login")
+    public String loginUser(Model model, Principal principal, @ModelAttribute("userLoginModel")
+                            UserLoginModel userLoginModel, BindingResult result) {
 
         // Redirection si déjà connecté
         if (principal != null) {
             return "redirect:/home";
         }
 
+        if (userLoginModel == null) {
+           userLoginModel = new UserLoginModel();
+        }
+
+        // modèle vide
+        model.addAttribute("userLoginModel", userLoginModel);
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
-             log.info("User est authentifié : {}", authentication.getName());
+            log.info("User est authentifié : {}", authentication.getName());
+            return "redirect:/home";
         } else {
             log.info("Controller : User non authentifié");
         }
 
-             // model vide
-       UserLoginModel userLoginModel = new UserLoginModel();
-       model.addAttribute("userLoginModel", userLoginModel);
+        if (result.hasErrors()) {
+           log.error("Erreurs de validation dans le formulaire de connexion");
+           return "login";
+        }
+
        model.addAttribute("success", "Connexion réussie !");
         return "login";
     }
