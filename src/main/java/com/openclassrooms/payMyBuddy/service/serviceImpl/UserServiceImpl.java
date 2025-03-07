@@ -132,11 +132,12 @@ public class UserServiceImpl implements UserService {
         // Traitement des données
         // Mapper à la main les champs qui peuvent être modifiés
         existingUser.setUsername(userModel.getUsername());
-        existingUser.setPassword(userModel.getPassword());
         existingUser.setSold(userModel.getSold());
 
         if (userModel.getPassword() != null && !userModel.getPassword().isEmpty()) {
-            existingUser.setPassword(passwordEncoder.encode(userModel.getPassword()));
+            if (!existingUser.getPassword().equals(userModel.getPassword())) {
+                existingUser.setPassword(passwordEncoder.encode(userModel.getPassword()));
+            }
         }
         // save
         UserEntity updatedUser = userRepository.save(existingUser);

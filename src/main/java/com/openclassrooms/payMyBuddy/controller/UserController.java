@@ -50,35 +50,25 @@ public class UserController {
         return "home";
     }
 
-    @GetMapping("/login")
-    public String login(Model model) {
-        model.addAttribute("userLoginModel", new UserLoginModel());
-        return "login";
-    }
 
-    @PostMapping("/login")
+    @GetMapping("/login")
     public String loginUser(Model model, Principal principal, @ModelAttribute("userLoginModel")
                             UserLoginModel userLoginModel, BindingResult result) {
 
         // Redirection si déjà connecté
         if (principal != null) {
             return "redirect:/home";
+        } else {
+            log.info("Controller : User non authentifié");
         }
 
         if (userLoginModel == null) {
            userLoginModel = new UserLoginModel();
+           model.addAttribute("userLoginModel", userLoginModel);
         }
 
         // modèle vide
         model.addAttribute("userLoginModel", userLoginModel);
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
-            log.info("User est authentifié : {}", authentication.getName());
-            return "redirect:/home";
-        } else {
-            log.info("Controller : User non authentifié");
-        }
 
         if (result.hasErrors()) {
            log.error("Erreurs de validation dans le formulaire de connexion");

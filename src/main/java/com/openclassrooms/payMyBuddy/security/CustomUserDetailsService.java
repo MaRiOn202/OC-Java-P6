@@ -1,11 +1,9 @@
 package com.openclassrooms.payMyBuddy.security;
 
 
-import com.openclassrooms.payMyBuddy.controller.UserController;
 import com.openclassrooms.payMyBuddy.entity.UserEntity;
 import com.openclassrooms.payMyBuddy.repository.UserRepository;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +32,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        log.debug("Tentative ds loadUserByUsername : {}", email);
+        log.info("Tentative ds loadUserByUsername : {}", email);
 
         UserEntity userEntity = userRepository.findByEmail(email);
         
@@ -50,6 +48,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 
         log.info("User chargé pour l'authentification : {}", userEntity.getEmail());
+
         return new org.springframework.security.core.userdetails.User(
                 userEntity.getEmail(),
                 userEntity.getPassword(),
