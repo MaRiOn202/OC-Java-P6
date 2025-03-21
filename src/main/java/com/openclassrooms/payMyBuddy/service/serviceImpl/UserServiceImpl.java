@@ -42,13 +42,30 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserModel getUserByEmail(String email) throws Exception {
+        //UserModel userModelConnected = getConnectingUser();
+
+        // 1 utilisateur connecté
+/*        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if(authentication == null || !authentication.isAuthenticated()) {
+            log.error("L'utilisateur n'est pas connecté !");
+            throw new Exception("Utilisateur non connecté.");
+        }
+        //
+        String email = authentication.getName();
+        log.info(" UserServiceImpl : Utilisateur authentifié : " + email);*/
 
         if (email == null) {
             log.info("L'email n'a pas été trouvé.");
             throw new Exception("L'email n'a pas été trouvé.");
         } else {
-            UserEntity user = userRepository.findByEmail(email);
-            UserModel userModel = userMapper.mapToUserModel(user);
+            log.info("Recherche user avec l'email : {}", email);
+            UserEntity userEntity = userRepository.findByEmail(email);
+            if (userEntity == null) {
+                log.info("Aucun utilisateur trouvé avec cet email.");
+                throw new Exception("L'utilisateur avec cet email n'existe pas.");
+            }
+            UserModel userModel = userMapper.mapToUserModel(userEntity);
             log.info("L'email a bien été trouvé.");
             return userModel;
         }
@@ -171,7 +188,7 @@ public class UserServiceImpl implements UserService {
         UserEntity userEntity = userRepository.findByEmail(email);
         if(userEntity== null) {
           log.error("Aucun utilisateur n'a été trouvé avec l'email : " + email);
-          throw new UserNotFoundException("Utilisateur non trouvé avec l'eamil : " + email);
+          throw new UserNotFoundException("Utilisateur non trouvé avec l'email : " + email);
         }
 
         // 3
@@ -198,7 +215,7 @@ public class UserServiceImpl implements UserService {
         UserEntity userEntityConnected = userRepository.findByEmail(userModelConnected.getEmail());
         if (newRelation == null) {
             log.error("Aucun utilisateur n'a été trouvé avec l'email : " + emailFriend);
-            throw new UserNotFoundException("Utilisateur non trouvé en base de données.");
+            throw new UserNotFoundException("Utilisateur non trouvé on trouvé avec l'email : " + emailFriend);
         }
         
 
@@ -231,18 +248,22 @@ public class UserServiceImpl implements UserService {
         Optional<UserEntity> optionalUserEntity = userRepository.findById(id);
 
         if (optionalUserEntity.isEmpty()) {
-            throw new UserNotFoundException("Utilisateur non toruvé avec l'id : " + id);
+            throw new UserNotFoundException("Utilisateur non trouvé avec l'id : " + id);
         }
-
         UserEntity userEntity = optionalUserEntity.get();
-
+        log.info("userEntity : {}", userEntity);
         // 2. user friends ctd les connections
         List<UserEntity> friends = userEntity.getConnections(); // car userEntity
+
+        ///////
+        if (friends == null) {
+            friends = new ArrayList<>();
+        }
+
         if (friends.isEmpty()) {
             log.info("Aucune relation trouvée pour : {}", userEntity.getEmail());
         }
-
-
+        
         // 3. List de UserConnectionModel
         UserConnectionModel userConnectionModel = new UserConnectionModel();
         userConnectionModel.setFriends(new ArrayList<>());

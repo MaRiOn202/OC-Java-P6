@@ -59,12 +59,13 @@ public class TransactionServiceImpl implements TransactionService {
         log.info(" TransactionServiceImpl : Utilisateur authentifié : " + email);
 
         UserEntity sender = userRepository.findByEmail(email);
-        log.info("Expéditeur trouvé : {} avec sold : {}",  sender.getEmail(), sender.getSold());
-
         if(sender == null) {
             log.error("TransServImpl : L'expéditeur est introuvable");
-           throw new UserNotFoundException("L'expéditeur est introuvable");
+            throw new UserNotFoundException("L'expéditeur est introuvable");
         }
+        log.info("Expéditeur trouvé : {} avec sold : {}",  sender.getEmail(), sender.getSold());
+
+
 
         // 2 destinataire
         log.info("Recherche du destinaitaire email : " + transactionModel.getReceiver());

@@ -19,8 +19,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 import java.util.Comparator;
@@ -41,8 +43,10 @@ public class TransactionController {
                                                                              
     @GetMapping("/transfert")
     public String accessToTransactionForm(Model model,
-                @RequestParam(defaultValue = "0") int page,
-                @RequestParam(defaultValue = "5") int nberOfOccurrences, Principal principal)
+                                          @RequestParam(defaultValue = "0") int page,
+                                          @RequestParam(defaultValue = "5") int nberOfOccurrences,
+                                          Principal principal,
+                                          @ModelAttribute("error") String error)
             throws Exception {
 
         if (principal == null) {
@@ -69,6 +73,10 @@ public class TransactionController {
         model.addAttribute("totalPages", transactionsPage.getTotalPages());
        model.addAttribute("transactionModel", new TransactionModel());
        model.addAttribute("relations", listUserConnections);
+
+        if (!error.isEmpty()) {
+           model.addAttribute("error", error);
+        }
        return "transfert";
     }
 
@@ -76,18 +84,19 @@ public class TransactionController {
 
 
     @PostMapping("/transfert/save")
-    public String transaction(@Valid TransactionModel transactionModel, BindingResult result, Model model) throws Exception {
+    public String transaction(@Valid TransactionModel transactionModel,
+                              BindingResult result,
+                              Model model) throws Exception {
 
         if (result.hasErrors()) {
            model.addAttribute("transactionModel", transactionModel);
-           model.addAttribute("error", "Erreur de validation");
-           return "transfert";
+           return "redirect:/transfert?error=true";
         }
         log.info("TransactionController => Destinataire sélectionné: {}", transactionModel.getReceiver());
 
         try {
            transactionService.createTransaction(transactionModel);
-           // récupréer transactions de l'utilisateur connecté mis à jour
+           // récupérer transactions de l'utilisateur connecté mis à jour
             UserModel userModel = userService.getConnectingUser();
 
             Pageable pageable = PageRequest.of(0, 5, Sort.by("localDateTime").descending());
@@ -102,18 +111,16 @@ public class TransactionController {
             model.addAttribute("relations", userService.getUserConnectionModel(userModel.getId())); // formulaire de relation à jour
 
             model.addAttribute("success", "Le transfert a bien été effectué !");
-            return "transfert";
+            return "redirect:/transfert?success=true";
 
         } catch (InvalidTransactionException e) {
             // Cas où le sold est insuffisant
             model.addAttribute("transactionModel", transactionModel);
-            model.addAttribute("error", "Erreur lors du transfert : Le solde est insuffisant !");
-            return "transfert";
+            return "redirect:/transfert?error=true";
         } catch (Exception e) {
             // Cas des autres erreurs
             model.addAttribute("transactionModel", transactionModel);
-            model.addAttribute("error", "Erreur lors du transfert : " + e.getMessage());
-            return "transfert";
+            return "redirect:/transfert?error=true";
         }
     }
 }

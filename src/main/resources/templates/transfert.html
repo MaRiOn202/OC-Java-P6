@@ -47,11 +47,11 @@
 </nav>
 
 <div th:if="${param.success}">
-    <div class="alert alert-info text-center">Le transfert a été effectué avec succès ! </div>
+    <div class="alert alert-info text-center">Le transfert a été effectué avec succès !</div>
 </div>
 
-<div th:if="${error}" class="alert alert-danger text-center">
-    <span th:text="${error}"></span>
+<div th:if="${param.error}">
+    <div class="alert alert-danger text-center">Erreur lors du transfert : Le solde est insuffisant !</div>
 </div>
 
 
@@ -88,7 +88,7 @@
                     </div>
 
                     <div class="col-md-2">
-                        <input class="form-control" min="0.0" placeholder="0€" required step="0.00"
+                        <input class="form-control" min="0.0" placeholder="0€" required step="0.10"
                                th:field="*{amount}" type="number">
                     </div>
 
@@ -136,11 +136,6 @@
                     </li>
                 </ul>
             </nav>
-
-            <!--            <div class="text-center mb-4">
-                            <a href="#" th:href="@{/home}" class="btn btn-secondary">Retour à l'accueil</a>
-                        </div>-->
-                
         </div>
 
 

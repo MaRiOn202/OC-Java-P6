@@ -98,6 +98,21 @@
 			<artifactId>mapstruct</artifactId>
 			<version>1.5.5.Final</version>
 		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -122,9 +137,12 @@
 				</executions>
 				<configuration>
 					<excludes>
-						<exclude>**/utils/*</exclude>
+						<exclude>**/entity/*</exclude>
 						<exclude>**/mapper/*</exclude>
 						<exclude>**/model/*</exclude>
+						<exclude>**/repository/*</exclude>
+						<exclude>**/security/*</exclude>
+						<exclude>**/exception/*</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
@@ -147,9 +165,12 @@
 						<phase>integration-test</phase>
 						<configuration>
 							<excludes>
-								<exclude>**/utils/*</exclude>
+								<exclude>**/entity/*</exclude>
 								<exclude>**/mapper/*</exclude>
 								<exclude>**/model/*</exclude>
+								<exclude>**/repository/*</exclude>
+								<exclude>**/security/*</exclude>
+								<exclude>**/exception/*</exclude>
 							</excludes>
 							<includes>
 								<include>**/*IT.java</include>

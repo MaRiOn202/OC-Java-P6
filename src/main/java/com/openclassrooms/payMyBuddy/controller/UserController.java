@@ -33,15 +33,6 @@ public class UserController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
 
-    @GetMapping("/check-auth")
-    public ResponseEntity<String> checkAuth() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        log.info("Utilisateur dans SecurityContext: {}", authentication.getPrincipal());
-        return ResponseEntity.ok("Utilisateur dans SecurityCOntext : " + authentication.getPrincipal());
-    }
-
-
-
    @GetMapping("home")
     public String home() {
        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
