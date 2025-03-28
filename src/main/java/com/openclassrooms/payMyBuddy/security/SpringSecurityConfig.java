@@ -40,10 +40,9 @@ public class SpringSecurityConfig {
                                 .requestMatchers("/register/**").permitAll()
                                 .requestMatchers("/login").permitAll()
                                 .requestMatchers("/home").permitAll()
-                                .requestMatchers("/profile/**").authenticated() 
+                                .requestMatchers("/profile/**").authenticated()
                                 .requestMatchers("/relation").authenticated()
                                 .requestMatchers("/transfert/**").authenticated()
-                                .requestMatchers("/check-auth").authenticated()
                                 .anyRequest().authenticated()    // sécu les requêtes
                 ).formLogin(
                         form -> form
@@ -86,6 +85,4 @@ public class SpringSecurityConfig {
 
 }
 
-
-    //.requestMatchers("/login").hasRole("USER")
 

@@ -39,32 +39,30 @@ public class UserServiceImpl implements UserService {
     private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
     
 
+/*            if (email == null) {
+        log.info("L'email n'a pas été trouvé.");
+        throw new Exception("L'email n'a pas été trouvé.");
+    } else {
+        log.info("Recherche user avec l'email : {}", email);
+        UserEntity userEntity = userRepository.findByEmail(email);
+        if (userEntity == null) {
+            log.info("Aucun utilisateur trouvé avec cet email.");
+            throw new Exception("L'utilisateur avec cet email n'existe pas.");
+        }
+        UserModel userModel = userMapper.mapToUserModel(userEntity);
+        log.info("L'email a bien été trouvé.");
+        return userModel;*/
 
     @Override
     public UserModel getUserByEmail(String email) throws Exception {
-        //UserModel userModelConnected = getConnectingUser();
 
         // 1 utilisateur connecté
-/*        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if(authentication == null || !authentication.isAuthenticated()) {
-            log.error("L'utilisateur n'est pas connecté !");
-            throw new Exception("Utilisateur non connecté.");
-        }
-        //
-        String email = authentication.getName();
-        log.info(" UserServiceImpl : Utilisateur authentifié : " + email);*/
-
         if (email == null) {
             log.info("L'email n'a pas été trouvé.");
             throw new Exception("L'email n'a pas été trouvé.");
         } else {
             log.info("Recherche user avec l'email : {}", email);
             UserEntity userEntity = userRepository.findByEmail(email);
-            if (userEntity == null) {
-                log.info("Aucun utilisateur trouvé avec cet email.");
-                throw new Exception("L'utilisateur avec cet email n'existe pas.");
-            }
             UserModel userModel = userMapper.mapToUserModel(userEntity);
             log.info("L'email a bien été trouvé.");
             return userModel;

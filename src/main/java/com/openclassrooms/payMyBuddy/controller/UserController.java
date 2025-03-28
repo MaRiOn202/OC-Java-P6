@@ -74,7 +74,7 @@ public class UserController {
     @GetMapping("/logoutSuccess")
     public String logoutSuccess(Model model, Principal principal) {
         if (principal != null) {
-            log.info("utilisateur dé connected : {}", principal.getName());
+            log.info("utilisateur déconnecté : {}", principal.getName());
         } else {
             log.info("Déconnexion réussie, pas de session active en cours d'exécution");
         }
@@ -90,7 +90,6 @@ public class UserController {
            log.info("redirection vers la page login car not utilisateur connecté");
            return "redirect:/login";
        }
-
        try {
            // vérifier l'utilisateur actuel
            log.info("chargemnt profile {}", principal.getName());
@@ -122,7 +121,6 @@ public class UserController {
     public String updateProfil(@Valid UserModel userModel, BindingResult result, Model model) throws Exception {
        log.info("accès vers profile/update effectué");
        if (result.hasErrors()) {
-          //model.addAttribute("error", "error de valiudation");
            model.addAttribute("userModel", userModel);
            return "profile";
        }

@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 @Controller
 @AllArgsConstructor
-//@RequestMapping("/register")
 public class RegisterController {
 
 

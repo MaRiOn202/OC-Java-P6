@@ -7,7 +7,6 @@ import com.openclassrooms.payMyBuddy.model.UserModel;
 import com.openclassrooms.payMyBuddy.service.TransactionService;
 import com.openclassrooms.payMyBuddy.service.UserService;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +21,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
-import java.util.Comparator;
-import java.util.List;
 
 
 @Controller
@@ -69,8 +65,8 @@ public class TransactionController {
        // Ajout != données au model
        model.addAttribute("userModel", userModel);
        model.addAttribute("transactions", transactionsPage.getContent());
-        model.addAttribute("currentPage", transactionsPage.getNumber());
-        model.addAttribute("totalPages", transactionsPage.getTotalPages());
+       model.addAttribute("currentPage", transactionsPage.getNumber());
+       model.addAttribute("totalPages", transactionsPage.getTotalPages());
        model.addAttribute("transactionModel", new TransactionModel());
        model.addAttribute("relations", listUserConnections);
 

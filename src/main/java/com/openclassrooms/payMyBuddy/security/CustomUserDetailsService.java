@@ -44,8 +44,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         log.info("Utilisateur trouvé : {}", email);
 
         log.info("Mot de passe en base : {}", userEntity.getPassword());
-        //log.info("Mot de passe encodé (1234) : {}", passwordEncoder.encode("1234"));
-
 
         log.info("User chargé pour l'authentification : {}", userEntity.getEmail());
 
@@ -53,16 +51,8 @@ public class CustomUserDetailsService implements UserDetailsService {
                 userEntity.getEmail(),
                 userEntity.getPassword(),
                 Collections.singletonList(new SimpleGrantedAuthority("USER")));
-                //getGrantedAuthorities(userEntity.getRole()));
-
-
+        
     }
-
- /*   private List<GrantedAuthority> getGrantedAuthorities(String role) {
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
-        return authorities;
-    }*/
 
 }
 
