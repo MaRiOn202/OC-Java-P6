@@ -45,8 +45,8 @@ public class RegisterControllerTest {
   /// pourquoi le user doit-il être authentifié ?? voir security pourtant ben config ???
     //    @AutoConfigureMockMvc(addFilters = false)
     
-/*    @Test
-    @WithAnonymousUser
+    @Test
+    @WithMockUser
     public void testRegistrationSuccess() throws Exception {
 
         // Registration new user
@@ -62,9 +62,9 @@ public class RegisterControllerTest {
                 .flashAttr("userModel", userModel)
                 .with(csrf()))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/register"))
-                .andExpect(flash().attributeExists("success"));
-    }*/
+                .andExpect(redirectedUrl("/register?success"))
+                .andReturn();
+    }
 
 /*    @Test
     public void testRegistrationWhenUserExists() throws Exception {

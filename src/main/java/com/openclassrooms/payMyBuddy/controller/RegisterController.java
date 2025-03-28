@@ -51,7 +51,7 @@ public class RegisterController {
          userService.saveUser(userModel);
          model.addAttribute("success", "L'utilisateur a été créé avec succès !");
         return "redirect:/register?success";
-        //renvoyer page home ?
+
     }                                              
 
     

@@ -20,8 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.anonymous;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -119,7 +118,8 @@ public class UserControllerTest {
                 .andExpect(status().is(401));
     }
 
-/*    @Test
+    @Test
+    @WithMockUser(username = "Michel3", roles = "USER")
     public void testAddRelation() throws Exception {
 
         UserConnectionModel userConnectionModel = new UserConnectionModel();
@@ -132,11 +132,12 @@ public class UserControllerTest {
         when(userService.addRelation(userConnectionModel.getEmail())).thenReturn(list);
 
         mockMvc.perform(post("/relation/save")
-                .flashAttr("userConnectionModel", userConnectionModel))
+                .flashAttr("userConnectionModel", userConnectionModel)
+                .with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/relation?success"))
-                .andExpect(model().attribute("success", "La relation a été ajoutée avec succès !"));
-    }*/
+                .andReturn();
+    }
 
 
 /*    @Test
