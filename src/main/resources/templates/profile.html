@@ -10,34 +10,24 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 
-
 <body>
-<!-- 1 -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
     <div class="container">
-
         <a class="navbar-brand mx-auto" th:href="@{/home}">Pay My Buddy</a>
-
-
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
-                <!-- /transfert -->
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/transfert}">Transférer</a>
                 </li>
-                <!--/profile -->
                 <li class="nav-item">
                     <a class="nav-link active" th:href="@{/profile}">Profil</a>
                 </li>
-                <!--/relation // ajouter relation  -->
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/relation}">Ajouter relation</a>
                 </li>
-                <!--/login  -->
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/login}">Login</a>
                 </li>
-                <!-- /logout -->
                 <li class="nav-item">
                     <a class="nav-link text-danger" th:href="@{/logout}">Se déconnecter</a>
                 </li>
@@ -47,32 +37,27 @@
 </nav>
 
 <div th:if="${param.success}">
-    <div class="alert alert-info text-center">Le profil a été modifié avec succès ! </div>
+    <div class="alert alert-info text-center">Le profil a été modifié avec succès !</div>
 </div>
 
 <div th:if="${param.error}">
-    <div class="alert alert-info text-center">Le profil n'a pas pu être chargé ! </div>
+    <div class="alert alert-info text-center">Le profil n'a pas pu être chargé !</div>
 </div>
 
-<!-- container princ  -->
 <div class="d-flex justify-content-center align-items-center vh-100">
-
     <div class="card shadow-sm p-4" style="width: 400px;height: 500px;">
 
         <div class="text-center mb-4">
-            <a href="#" th:href="@{/home}" class="btn btn-warning text-white fw-bold"
-               style="border-radius: 8px;">
+            <a href="#" th:href="@{/home}" class="btn btn-warning text-white fw-bold" style="border-radius: 8px;">
                 Profil
             </a>
         </div>
 
-        <!-- Form -->
-        <form th:if="${isOk != null && !isOk}" th:action="@{/profile/toChange}" method="post" th:object="${userModel}">
-            <input type="hidden" name="isOk" th:value="${isOk}">
+        <!-- Formulaire lecture -->
+        <form th:if="${editMode != null and !editMode}" th:action="@{/profile/toChange}" method="post" th:object="${userModel}">
+            <input type="hidden" name="editMode" th:value="${editMode}">
 
-            <!-- mode lecture simple -->
-            <div th:if="${!isOk}">
-
+            <div>
                 <div class="mb-4">
                     <p class="form-label fw-bold mb-0">Username : </p>
                     <span th:text="*{username}"></span>
@@ -90,41 +75,39 @@
                     <span th:text="*{sold}"></span>
                 </div>
                 <button type="submit" class="btn btn-secondary">Modifier</button>
-
             </div>
         </form>
 
-        <!-- Form -->
-        <form th:if="${isOk}" th:action="@{/profile/update}" method="post" th:object="${userModel}">
+        <!-- Formulaire édition -->
+        <form th:if="${editMode}" th:action="@{/profile/update}" method="post" th:object="${userModel}">
 
-            <!-- mode edition -->
-                <div class="mb-4">
-                    <label for="username" class="form-label fw-bold mb-0">Username : </label>
-                    <input type="text" id="username" th:field="*{username}" class="form-control">
-                </div>
-            <div class="mb-4">                                                                             
+            <div class="mb-4">
+                <label for="username" class="form-label fw-bold mb-0">Username : </label>
+                <input type="text" id="username" th:field="*{username}" class="form-control">
+            </div>
+            <div class="mb-4">
                 <label for="email" class="form-label fw-bold mb-0">Email : </label>
-                <input type="email" id="email" th:field="*{email}" class="form-control" th:if="isOk">
+                <input type="email" id="email" th:field="*{email}" class="form-control">
             </div>
             <div class="mb-4">
                 <label for="password" class="form-label fw-bold mb-0">Password : </label>
                 <input type="password" id="password" name="password" class="form-control"
                        th:value="${userModel.password}"
-                       th:readonly="${isOk}"
+                       th:readonly="${editMode}"
                        onfocus="this.removeAttribute('readonly'); this.value='';">
             </div>
             <div class="mb-4">
                 <label for="sold" class="form-label fw-bold mb-0">Solde : </label>
-                <input type="number" id="sold" th:field="*{sold}" class="form-control" step="0.01" min="0" value="0" placeholder="0.0€">
+                <input type="number" id="sold" th:field="*{sold}" class="form-control" step="0.01" min="0" placeholder="0.0€">
             </div>
-                <button type="submit" class="btn btn-primary">Enregistrer</button>
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
         </form>
 
     </div>
-
 </div>
 
 </body>
+
 <footer class="bg-dark text-white text-center py-3 mt-4">
     <p>&copy; 2024 Pay My Buddy</p>
 </footer>

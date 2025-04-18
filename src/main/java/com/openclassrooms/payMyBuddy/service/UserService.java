@@ -16,9 +16,6 @@ public interface UserService {
 
     UserModel getUser(String userName) throws Exception;
 
-    List<UserModel> findAllUsers() throws Exception;
-
-
     UserModel saveUser(UserModel userModel) throws Exception;
 
     UserModel updateUser(UserModel userModel) throws Exception;

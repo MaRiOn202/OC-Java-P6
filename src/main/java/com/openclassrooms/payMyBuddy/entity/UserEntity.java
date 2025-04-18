@@ -17,6 +17,7 @@ import java.util.Objects;
 @Setter
 @Entity
 @Table (name = "Users")
+@ToString(exclude = {"transactions", "connections", "password"})
 public class UserEntity {
 
     @Id
@@ -53,7 +54,7 @@ public class UserEntity {
     private List<TransactionEntity> transactions;
 
 
-    @Override
+/*    @Override
     public String toString() {
         return "UserEntity{" +
                 "id=" + id +
@@ -65,5 +66,5 @@ public class UserEntity {
                 ", connections=" + connections +
                 ", transactions=" + transactions +
                 '}';
-    }
+    }*/
 }

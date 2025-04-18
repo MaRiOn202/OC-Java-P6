@@ -25,6 +25,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 
+/**
+ *    Service permettant de gérer les utilisateurs.
+ * */
+
 @AllArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
@@ -37,38 +41,31 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
-    
 
-/*            if (email == null) {
-        log.info("L'email n'a pas été trouvé.");
-        throw new Exception("L'email n'a pas été trouvé.");
-    } else {
-        log.info("Recherche user avec l'email : {}", email);
-        UserEntity userEntity = userRepository.findByEmail(email);
-        if (userEntity == null) {
-            log.info("Aucun utilisateur trouvé avec cet email.");
-            throw new Exception("L'utilisateur avec cet email n'existe pas.");
-        }
-        UserModel userModel = userMapper.mapToUserModel(userEntity);
-        log.info("L'email a bien été trouvé.");
-        return userModel;*/
 
+
+    /**
+     *  Méthode permettant de récupérer un utilisateur par son email
+     *
+     *  @param email
+     *  @return UserModel
+     *  @throws Exception
+     * */
     @Override
     public UserModel getUserByEmail(String email) throws Exception {
 
-        // 1 utilisateur connecté
         if (email == null) {
             log.info("L'email n'a pas été trouvé.");
             throw new Exception("L'email n'a pas été trouvé.");
         } else {
-            log.info("Recherche user avec l'email : {}", email);
-            UserEntity userEntity = userRepository.findByEmail(email);
-            UserModel userModel = userMapper.mapToUserModel(userEntity);
+            UserEntity user = userRepository.findByEmail(email);
+            UserModel userModel = userMapper.mapToUserModel(user);
             log.info("L'email a bien été trouvé.");
             return userModel;
         }
     }
 
+  /// à supprimer
     @Override
     public UserModel getUser(String userName) throws Exception {
         if (userName == null) {
@@ -82,20 +79,13 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    @Override
-    public List<UserModel> findAllUsers() {
 
-        List<UserEntity> listUsersEntity = userRepository.findAll();
-        if (listUsersEntity.isEmpty()) {
-              return Collections.emptyList();
-          }
-        return  listUsersEntity
-                .stream()
-                .map(userEntity -> userMapper.mapToUserModel(userEntity))
-                .collect(Collectors.toList());
-    }
-
-
+    /**
+     *  Méthode permettant de sauvegarder un utilisateur en base de données
+     *
+     *  @param userModel
+     *  @return UserModel
+     * */
     @Override
     public UserModel saveUser(UserModel userModel)  {
 
@@ -103,27 +93,28 @@ public class UserServiceImpl implements UserService {
         //Traiter les données
         // Construire les réponses à renvoyer à l'utilisateur
         log.info("Tentative de création d'un user avec l'email: {}", userModel.getEmail());
-
- /*       if (userModel.getSold() == null) {
-           userModel.setSold(0.0);
-        }*/
-
+        
         userModel.setPassword(passwordEncoder.encode(userModel.getPassword()));
         UserEntity userEntity = userMapper.mapToUserEntity(userModel);
-        log.info("User à sauvegarder après mapping: Email={}, Username={}", userEntity.getEmail(), userEntity.getUsername());
 
         log.info("Avant sauvegarde: Email={}, Username={}", userEntity.getEmail(), userEntity.getUsername());
         userEntity = userRepository.save(userEntity);
-        log.info("User a bien été sauvegardé victoire ! : {}", userEntity);
 
         UserModel savedUser = userMapper.mapToUserModel(userEntity);
-        log.info("Utilisateur final retournée : Email={}, Username={}", savedUser.getEmail(), savedUser.getUsername());
         log.info("L'utilisateur a bien été ajouté.");
         return savedUser;
 
     }
 
 
+    /**
+     *  Méthode permettant de mettre à jour les données d'un utilisateur
+     *
+     *  @param userModel
+     *  @return UserModel
+     *  @throws UserNotFoundException
+     *  @throws IllegalArgumentException
+     * */
     @Override
     public UserModel updateUser(UserModel userModel) {
         // 1  Validation des données d'entrée
@@ -139,7 +130,6 @@ public class UserServiceImpl implements UserService {
             throw new UserNotFoundException("Utilisateur non trouvé.");
         }
 
-        // pb Id
         if (existingUser.getId() == null) {
             throw new IllegalArgumentException("L'Id du user ne peut pas être null");
         }
@@ -154,20 +144,28 @@ public class UserServiceImpl implements UserService {
                 existingUser.setPassword(passwordEncoder.encode(userModel.getPassword()));
             }
         }
-        // save
+
         UserEntity updatedUser = userRepository.save(existingUser);
 
         // Construire réponses à renvoyer à l'utilisateur 
         UserModel userReturn = userMapper.mapToUserModel(updatedUser);
-            log.info("L'utilisateur a été mis à jour avec succès : " + userReturn.getEmail());
+        log.info("L'utilisateur a été mis à jour avec succès : " + userReturn.getEmail());
         return userReturn;
     }
 
-    // Validation des données d'entrée
-    //Traiter les données
-    // Construire les réponses à renvoyer à l'utilisateur
+
+    /**
+     *  Méthode permettant de récupérer l'utilisateur connecté
+     *
+     *  @return UserModel
+     *  @throws UserNotFoundException
+     *  @throws UserNotConnectedException
+     * */
     @Override                        
     public UserModel getConnectingUser() throws UserNotFoundException, UserNotConnectedException {
+        // Validation des données d'entrée
+        //Traiter les données
+        // Construire les réponses à renvoyer à l'utilisateur
         // 1
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();  // contexte de sécurité pour récupérer le user connecté
         log.info("Utilisateur authentifié après connexion : {}", authentication);
@@ -177,12 +175,8 @@ public class UserServiceImpl implements UserService {
             throw new UserNotConnectedException("Utilisateur non connecté.");
         }
 
-        log.info("User identifié : {}", authentication.getPrincipal());
-
         // 2
         String email = authentication.getName();
-        log.info("Email récupéré depuis l'authentication : {}", email);
-
         UserEntity userEntity = userRepository.findByEmail(email);
         if(userEntity== null) {
           log.error("Aucun utilisateur n'a été trouvé avec l'email : " + email);
@@ -204,41 +198,55 @@ public class UserServiceImpl implements UserService {
 
     }
 
-   // ajouter les connexions userconnexionModel
+
+    /**
+     *  Méthode permettant d'ajouter une relation / connexion entre l'utilisateur connecté et un autre utilisateur
+     *  en vue d'effectuer par la suite un transfert d'argent
+     *
+     *  @param emailFriend
+     *  @return une liste de UserModel représentant les amis de l'utilisateur
+     *  @throws UserNotFoundException
+     *  @throws Exception
+     * */
     @Transactional
     public List<UserModel> addRelation(String emailFriend) throws Exception {
         UserModel userModelConnected = getConnectingUser();
 
         UserEntity newRelation = userRepository.findByEmail(emailFriend);
         UserEntity userEntityConnected = userRepository.findByEmail(userModelConnected.getEmail());
+
         if (newRelation == null) {
             log.error("Aucun utilisateur n'a été trouvé avec l'email : " + emailFriend);
             throw new UserNotFoundException("Utilisateur non trouvé on trouvé avec l'email : " + emailFriend);
         }
-        
 
         if (!userEntityConnected.getConnections().contains(newRelation)) {
             userEntityConnected.getConnections().add(newRelation);
             newRelation.getConnections().add(userEntityConnected);    // relation bidirectionnelle
-            log.info("Récupération de l'utilisateur connecté : {}", userEntityConnected.getEmail());
-            log.info("Ajout de la relation  : {}", newRelation.getEmail());
             log.info("Ajout de la relation entre {} et {}", userEntityConnected.getEmail(),
                     newRelation.getEmail());
-            //userRepository.save(userEntityConnected);
 
             userEntityConnected = userRepository.save(userEntityConnected);
             userRepository.save(newRelation);
-            //persister la relation
+
         } else {
             log.error("La relation existe déjà");
             throw new Exception("La relation existe déjà");
         }
-        return userEntityConnected.getConnections()
+        return userEntityConnected.getConnections()         //persister la relation
                 .stream()
                 .map(userMapper::mapToUserModel)
                 .collect(Collectors.toList());
     }
 
+
+    /**
+     *  Méthode permettant de récupérer les connexions d'un utilisateur
+     *
+     *  @param id
+     *  @return UserConnectionModel
+     *  @throws UserNotFoundException
+     * */
     @Override
     public UserConnectionModel getUserConnectionModel(Long id) {
 
@@ -253,7 +261,6 @@ public class UserServiceImpl implements UserService {
         // 2. user friends ctd les connections
         List<UserEntity> friends = userEntity.getConnections(); // car userEntity
 
-        ///////
         if (friends == null) {
             friends = new ArrayList<>();
         }

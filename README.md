@@ -39,7 +39,7 @@ Avec PayMyBuddy, vous pouvez :
 ### 📋 Tests
 
 ```sh
- mvn mvn verify
+ mvn verify
 ```
 
 ### Build de l'application :

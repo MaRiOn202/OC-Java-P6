@@ -70,11 +70,6 @@ public class SpringSecurityConfig {
     }
     
 
-/*    @Bean
-    public org.springframework.security.authentication.AuthenticationManager AuthenticationManager(AuthenticationConfiguration auth) throws Exception {
-        return auth.getAuthenticationManager();
-    }*/
-
     @Bean
     public AuthenticationManager auth(HttpSecurity http, BCryptPasswordEncoder bCryptPasswordEncoder) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);

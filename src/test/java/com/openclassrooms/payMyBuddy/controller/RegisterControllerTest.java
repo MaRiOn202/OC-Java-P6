@@ -4,10 +4,8 @@ import com.openclassrooms.payMyBuddy.model.UserModel;
 import com.openclassrooms.payMyBuddy.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -16,7 +14,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -40,10 +37,7 @@ public class RegisterControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
     }
-
-
-  /// pourquoi le user doit-il être authentifié ?? voir security pourtant ben config ???
-    //    @AutoConfigureMockMvc(addFilters = false)
+    
     
     @Test
     @WithMockUser
@@ -65,42 +59,5 @@ public class RegisterControllerTest {
                 .andExpect(redirectedUrl("/register?success"))
                 .andReturn();
     }
-
-/*    @Test
-    public void testRegistrationWhenUserExists() throws Exception {
-        UserModel userModelExisting = new UserModel();
-        userModelExisting.setEmail("michel6@paymybuddy.com");
-        userModelExisting.setUsername("Michel6");
-        userModelExisting.setPassword("1234");
-
-        UserModel userModel = new UserModel();
-        userModel.setEmail("michel6@paymybuddy.com");
-        userModel.setUsername("NewName");
-        userModel.setPassword("1234");
-
-        when(userService.getUserByEmail(userModel.getEmail())).thenReturn(userModelExisting);
-
-        mockMvc.perform(post("/register/save")
-                .flashAttr("userModel", userModel))
-                .andExpect(status().isOk())
-                .andExpect(view().name("register"))
-                .andExpect(model().attributeHasFieldErrors("userModel", "email"))
-                .andExpect(model().attributeHasFieldErrorCode("userModel", "email", "error"));
-
-    }*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

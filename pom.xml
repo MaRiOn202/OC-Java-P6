@@ -156,12 +156,12 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>3.2.3</version>
 				<configuration>
-					<excludes>
-						<exclude>**/*IT.java</exclude>
-						<exclude>**/*IT.java</exclude>
-					</excludes>
+					<includes>
+						<include>**/*IT.java</include>
+						<include>**/*Test.java</include>
+					</includes>
 				</configuration>
-				<executions>
+				<!--<executions>
 					<execution>
 						<id>integration-test</id>
 						<goals>
@@ -171,18 +171,16 @@
 						<configuration>
 							<excludes>
 								<exclude>**/entity/*</exclude>
+								<exclude>**/entity/*</exclude>
 								<exclude>**/mapper/*</exclude>
 								<exclude>**/model/*</exclude>
 								<exclude>**/repository/*</exclude>
 								<exclude>**/security/*</exclude>
 								<exclude>**/exception/*</exclude>
 							</excludes>
-							<includes>
-								<include>**/*IT.java</include>
-							</includes>
 						</configuration>
 					</execution>
-				</executions>
+				</executions>-->
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

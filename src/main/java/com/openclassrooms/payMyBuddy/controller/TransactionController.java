@@ -25,6 +25,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.security.Principal;
 
 
+/**
+ *    Contrôleur permettant de gérer les transferts d'argent entre les utilisateurs
+ * */
+
 @Controller
 public class TransactionController {
 
@@ -36,7 +40,18 @@ public class TransactionController {
 
     private static final Logger log = LoggerFactory.getLogger(TransactionController.class);
 
-                                                                             
+
+    /**
+     *  Méthode permettant d'afficher le formulaire de transfert ainsi que les transactions de l'utilisateur
+     *
+     *  @param model
+     *  @param page
+     *  @param nberOfOccurrences
+     *  @param principal
+     *  @param error
+     *  @return la vue "transfert"
+     *  @throws Exception
+     * */
     @GetMapping("/transfert")
     public String accessToTransactionForm(Model model,
                                           @RequestParam(defaultValue = "0") int page,
@@ -50,7 +65,6 @@ public class TransactionController {
             return "redirect:/login";
         }
 
-        // Verif user connecté
         UserModel userModel = userService.getConnectingUser();
         log.info("accès vers /transfert utilisateur : {} ", userModel.getEmail());
 
@@ -76,9 +90,17 @@ public class TransactionController {
        return "transfert";
     }
 
-    
 
 
+    /**
+     *  Méthode permettant de traiter une transaction envoyée par l'utilisateur
+     *
+     *  @param transactionModel
+     *  @param result
+     *  @param model
+     *  @return redirection vers la page de transfert avec un message de succès ou d'erreur
+     *  @throws Exception
+     * */
     @PostMapping("/transfert/save")
     public String transaction(@Valid TransactionModel transactionModel,
                               BindingResult result,

@@ -26,6 +26,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+
+/**
+ *    Service permettant de gérer les transactions entre utilisateurs.
+ * */
+
 @AllArgsConstructor
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -37,13 +42,19 @@ public class TransactionServiceImpl implements TransactionService {
     @Autowired
     private TransactionMapper transactionMapper;
 
-    @Autowired
-    private UserMapper userMapper;
-
     private static final Logger log = LoggerFactory.getLogger(TransactionServiceImpl.class);
 
 
-
+    /**
+     *  Méthode permettant de créer une transaction entre un utilisateur connecté et un destinataire
+     *
+     *  @param transactionModel
+     *  @return TransactionModel
+     *  @throws UserNotFoundException
+     *  @throws ReceiverNotFoundException
+     *  @throws InvalidTransactionException
+     *  @throws Exception
+     * */
     @Override
     public TransactionModel createTransaction(TransactionModel transactionModel) throws Exception {
 
@@ -86,19 +97,19 @@ public class TransactionServiceImpl implements TransactionService {
             throw new InvalidTransactionException("Le montant de la transaction doit être positif");
         }
 
-        // verif sold expé
-        log.info("Sold actuel du user connecté / expédi. ({}) : {} ", sender.getEmail(), sender.getSold());
-        if (sender.getSold() < transactionModel.getAmount()) {
-            log.error("TransServImpl : Le solde de l'utilisateur est insuffisant");
-            throw new InvalidTransactionException("Le solde de l'utilisateur est insuffisant");
-        }
-
         // commission 5%
         double commission = (5.0 / 100) * transactionModel.getAmount()  ;
         transactionModel.setPercentage(commission);
 
         // montant total avec com
         double totalMontant = transactionModel.getAmount() + commission;
+
+        // verif sold expé
+        log.info("Sold actuel du user connecté / expédi. ({}) : {} ", sender.getEmail(), sender.getSold());
+        if (sender.getSold() < totalMontant) {
+            log.error("TransServImpl : Le solde est insuffisant pour couvrir le montant + la commission");
+            throw new InvalidTransactionException("Le solde est insuffisant pour couvrir le montant + la commission");
+        }
 
         sender.setSold(sender.getSold() - totalMontant);      // solde - totalMontant
         log.info("Sold du sender : {} - totalMontant : {} (total commission : {} )", sender.getSold(), totalMontant, commission);
@@ -115,8 +126,14 @@ public class TransactionServiceImpl implements TransactionService {
         TransactionModel transactionResult = transactionMapper.mapToTransactionModel(transactionEntity);
         return transactionResult;   // retour model + commission
     }
-    
 
+
+    /**
+     *  Méthode permettant de sauvegarder une transaction en base de données
+     *
+     *  @param transactionModel
+     *  @return TransactionModel
+     * */
     @Override
     public TransactionModel saveTransaction(TransactionModel transactionModel) {
 
@@ -132,6 +149,14 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
 
+    /**
+     *  Méthode permettant de récupérer toutes les transactions d'un utilisateur (destinataire ou expéditeur)
+     *
+     *  @param emailUser
+     *  @param pageable
+     *  @return Page<TransactionModel>
+     *  @throws UserNotFoundException
+     * */
     @Override
     public Page<TransactionModel> getTransactionsByUser(String emailUser, Pageable pageable) {
 
