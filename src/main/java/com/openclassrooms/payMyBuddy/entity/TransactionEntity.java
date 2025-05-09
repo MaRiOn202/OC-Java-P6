@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 
 //@Data
 @NoArgsConstructor
@@ -16,7 +18,7 @@ public class TransactionEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @NotNull
+    @Column(name = "id")
     private Long id;
 
     @ManyToOne
@@ -33,4 +35,28 @@ public class TransactionEntity {
     @Column
     private Double amount;
 
+    @Column
+    private Double percentage;
+
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime localDateTime = LocalDateTime.now();
+
+    // persistence de Entity en bdd pas à l'instanciation
+    @PrePersist
+    protected void onCreate() {
+        this.localDateTime = LocalDateTime.now();
+    }
+
+    @Override
+    public String toString() {
+        return "TransactionEntity{" +
+                "id=" + id +
+                ", sender=" + sender +
+                ", receiver=" + receiver +
+                ", description='" + description + '\'' +
+                ", amount=" + amount +
+                ", percentage=" + percentage +
+                ", localDateTime=" + localDateTime +
+                '}';
+    }
 }
