@@ -21,6 +21,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,7 +87,7 @@ public class UserControllerTest {
 
         // Simuler un user
         UserModel userModel = new UserModel(4L, "Michel4", "michel4@paymybuddy.com",
-                "$2a$10$ekHyPA/UB8tJ2IS4Vp5Pquxzwi9x0Aila0ynInvTTCuVWJ550nsFK", 100.00);
+                "$2a$10$ekHyPA/UB8tJ2IS4Vp5Pquxzwi9x0Aila0ynInvTTCuVWJ550nsFK", BigDecimal.valueOf(100.00));
         when(userService.getConnectingUser()).thenReturn(userModel);
         
         mockMvc.perform(get("/profile"))
@@ -108,7 +109,7 @@ public class UserControllerTest {
         SecurityContextHolder.getContext().setAuthentication(auth);
         
         UserModel userModel = new UserModel(4L, "Michel4", "michel4@paymybuddy.com",
-                "$2a$10$ekHyPA/UB8tJ2IS4Vp5Pquxzwi9x0Aila0ynInvTTCuVWJ550nsFK", 100.00);
+                "$2a$10$ekHyPA/UB8tJ2IS4Vp5Pquxzwi9x0Aila0ynInvTTCuVWJ550nsFK", BigDecimal.valueOf(100.00));
         when(userService.getConnectingUser()).thenReturn(userModel);
 
         mockMvc.perform(post("/profile/toChange")
@@ -126,10 +127,10 @@ public class UserControllerTest {
     public void testProfileToUpdateRedirectionSuccess() throws Exception {
         // User avt modif
         UserModel userModel = new UserModel(4L, "Michel4", "michel4@paymybuddy.com",
-                "$2a$10$ekHyPA/UB8tJ2IS4Vp5Pquxzwi9x0Aila0ynInvTTCuVWJ550nsFK", 100.00);
+                "$2a$10$ekHyPA/UB8tJ2IS4Vp5Pquxzwi9x0Aila0ynInvTTCuVWJ550nsFK", BigDecimal.valueOf(100.00));
         // Modifs
         UserModel userModelUpdated = new UserModel(4L, "MichelToutCourt", "michel4@paymybuddy.com",
-                "$2a$10$ekHyPA/UB8tJ2IS4Vp5Pquxzwi9x0Aila0ynInvTTCuVWJ550nsFK", 500.00);
+                "$2a$10$ekHyPA/UB8tJ2IS4Vp5Pquxzwi9x0Aila0ynInvTTCuVWJ550nsFK", BigDecimal.valueOf(500.00));
 
         when(userService.getConnectingUser()).thenReturn(userModel);
 
@@ -172,7 +173,7 @@ public class UserControllerTest {
 
         // Friend
         List<UserModel> list = new ArrayList<>();
-        list.add(new UserModel(5L, "MichelNum5", "michel5@paymybuddy.com", "1234", 200.00));
+        list.add(new UserModel(5L, "MichelNum5", "michel5@paymybuddy.com", "1234", BigDecimal.valueOf(200.00)));
 
         when(userService.addRelation(userConnectionModel.getEmail())).thenReturn(list);
 

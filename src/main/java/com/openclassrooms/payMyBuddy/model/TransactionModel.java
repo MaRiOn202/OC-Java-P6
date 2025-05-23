@@ -1,13 +1,10 @@
 package com.openclassrooms.payMyBuddy.model;
 
-import com.openclassrooms.payMyBuddy.entity.UserEntity;
-import jakarta.persistence.Column;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+
+import jakarta.validation.constraints.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 
 @Data
@@ -30,9 +27,11 @@ public class TransactionModel {
     private String receiverName;
 
     @NotNull(message = "Le montant ne peut pas être nul")
-    @Min(value=1, message = "Le montant doit être supérieur à 0")
-    private Double amount;
-    private Double percentage;
+    @DecimalMin(value = "0.01", message = "Le montant doit être supérieur à 0")
+    @Digits(integer = 10, fraction = 2, message = "Le montant doit avoir au maximum 2 décimales")
+    private BigDecimal amount;
+    @Digits(integer = 3, fraction = 2, message = "Le pourcentage doit avoir au maximum 2 décimales")
+    private BigDecimal percentage;
 
     @Override
     public boolean equals(Object o) {

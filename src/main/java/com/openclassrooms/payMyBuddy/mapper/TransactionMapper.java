@@ -11,7 +11,7 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel="spring")
 public interface TransactionMapper {
 
-    @Mapping(ignore = true, target= "sender")         // a voir
+    @Mapping(ignore = true, target= "sender")
     @Mapping(ignore = true, target= "receiver")
     TransactionEntity mapToTransactionEntity(TransactionModel transactionModel);
 
