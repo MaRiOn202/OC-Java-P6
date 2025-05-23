@@ -11,6 +11,7 @@ import com.openclassrooms.payMyBuddy.model.TransactionModel;
 import com.openclassrooms.payMyBuddy.repository.TransactionRepository;
 import com.openclassrooms.payMyBuddy.repository.UserRepository;
 import com.openclassrooms.payMyBuddy.service.TransactionService;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +22,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static java.math.BigDecimal.*;
 
 
 /**
@@ -56,6 +61,7 @@ public class TransactionServiceImpl implements TransactionService {
      *  @throws Exception
      * */
     @Override
+    @Transactional
     public TransactionModel createTransaction(TransactionModel transactionModel) throws Exception {
 
         // 1 utilisateur connecté
@@ -77,7 +83,6 @@ public class TransactionServiceImpl implements TransactionService {
         log.info("Expéditeur trouvé : {} avec sold : {}",  sender.getEmail(), sender.getSold());
 
 
-
         // 2 destinataire
         log.info("Recherche du destinaitaire email : " + transactionModel.getReceiver());
 
@@ -89,31 +94,44 @@ public class TransactionServiceImpl implements TransactionService {
         }
         log.info("Le destinataire a été trouvé : {} ", receiver.getEmail());
 
+
+        // Vérification côté back de la relation entre un sender et un receiver
+        if (sender.getConnections() == null || !sender.getConnections().contains(receiver)) {
+            log.error("TransServImpl : Le destinataire {} est n'est pas une relation de {}", receiver.getEmail(), sender.getEmail());
+            throw new InvalidTransactionException("Le transfert d'argent n'est possible que si vous êtes en relation avec le destinataire.");
+        }
+        log.info("Le destinataire fait bien partie de la liste d'amis");
         
         // montant +
-        log.info("Le montant de la transac : {} ", transactionModel.getAmount());
-        if (transactionModel.getAmount() <= 0) {
+        BigDecimal amount = transactionModel.getAmount();     // BigDecimal
+        log.info("Le montant de la transac : {} ", amount);
+
+        if (amount == null || amount.compareTo(ZERO) <= 0) {
             log.error("TransServImpl : Le montant de la transaction doit être positif");
             throw new InvalidTransactionException("Le montant de la transaction doit être positif");
         }
 
         // commission 5%
-        double commission = (5.0 / 100) * transactionModel.getAmount()  ;
+        BigDecimal commissionOfFivePercent = new BigDecimal("0.05");
+        BigDecimal commission = amount.multiply(commissionOfFivePercent).setScale(2, RoundingMode.HALF_UP);
         transactionModel.setPercentage(commission);
 
         // montant total avec com
-        double totalMontant = transactionModel.getAmount() + commission;
+        BigDecimal totalMontant = amount.add(commission);
 
         // verif sold expé
+        BigDecimal senderSold = sender.getSold();
         log.info("Sold actuel du user connecté / expédi. ({}) : {} ", sender.getEmail(), sender.getSold());
-        if (sender.getSold() < totalMontant) {
+
+        if (senderSold.compareTo(totalMontant) < 0 ) {
             log.error("TransServImpl : Le solde est insuffisant pour couvrir le montant + la commission");
             throw new InvalidTransactionException("Le solde est insuffisant pour couvrir le montant + la commission");
         }
 
-        sender.setSold(sender.getSold() - totalMontant);      // solde - totalMontant
+        sender.setSold(senderSold.subtract(totalMontant));      // solde - totalMontant
         log.info("Sold du sender : {} - totalMontant : {} (total commission : {} )", sender.getSold(), totalMontant, commission);
-        receiver.setSold(receiver.getSold() + transactionModel.getAmount()); // amount ss commission
+        receiver.setSold(receiver.getSold().add(amount)); // amount ss commission
+
         TransactionEntity transactionEntity = transactionMapper.mapToTransactionEntity(transactionModel);
         transactionEntity.setSender(sender);
         transactionEntity.setReceiver(receiver);

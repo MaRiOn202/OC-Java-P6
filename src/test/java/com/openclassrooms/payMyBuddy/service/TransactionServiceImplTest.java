@@ -25,6 +25,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 
+import java.math.BigDecimal;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -66,19 +67,19 @@ public class TransactionServiceImplTest {
 
         sender = new UserEntity();
         sender.setEmail("michel1@paymybuddy.com");
-        sender.setSold(200.0);
+        sender.setSold(BigDecimal.valueOf(200.0));
 
         receiver = new UserEntity();
         receiver.setEmail("michel2@paymybuddy.com");
-        receiver.setSold(60.0);
+        receiver.setSold(BigDecimal.valueOf(60.0));
 
         transactionEntity = new TransactionEntity();
         transactionEntity.setSender(sender);
         transactionEntity.setReceiver(receiver);
-        transactionEntity.setAmount(20.0);
+        transactionEntity.setAmount(BigDecimal.valueOf(20.0));
 
         transactionModel = new TransactionModel();
-        transactionModel.setAmount(20.0);
+        transactionModel.setAmount(BigDecimal.valueOf(20.0));
         transactionModel.setReceiver("michel2@paymybuddy.com");
 
         // Authentication
@@ -93,6 +94,8 @@ public class TransactionServiceImplTest {
 
     @Test
     public void testCreateTransactionTestReturnNewTransaction() throws Exception {
+
+        sender.setConnections(Collections.singletonList(receiver));
 
          when(userRepository.findByEmail("michel1@paymybuddy.com")).thenReturn(sender);
          when(userRepository.findByEmail("michel2@paymybuddy.com")).thenReturn(receiver);
@@ -143,7 +146,8 @@ public class TransactionServiceImplTest {
     @Test
     public void testCreateTransactionWhenSoldIsInsufficient() {
         // sold      // transac = 20.0
-        sender.setSold(19.20);
+        sender.setSold(BigDecimal.valueOf(19.20));
+        sender.setConnections(Collections.singletonList(receiver));
 
         when(userRepository.findByEmail("michel1@paymybuddy.com")).thenReturn(sender);
         when(userRepository.findByEmail("michel2@paymybuddy.com")).thenReturn(receiver);
@@ -152,7 +156,7 @@ public class TransactionServiceImplTest {
             transactionServiceImpl.createTransaction(transactionModel);
         });
 
-        assertEquals("Le solde de l'utilisateur est insuffisant", e.getMessage());
+        assertEquals("Le solde est insuffisant pour couvrir le montant + la commission", e.getMessage());
 
     }
 

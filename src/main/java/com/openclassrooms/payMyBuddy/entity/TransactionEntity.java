@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 
@@ -32,11 +33,11 @@ public class TransactionEntity {
     @Column
     private String description;
 
-    @Column
-    private Double amount;
+    @Column(precision = 10, scale = 2)
+    private BigDecimal amount;
 
-    @Column
-    private Double percentage;
+    @Column(precision = 5, scale = 2)
+    private BigDecimal percentage;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime localDateTime = LocalDateTime.now();

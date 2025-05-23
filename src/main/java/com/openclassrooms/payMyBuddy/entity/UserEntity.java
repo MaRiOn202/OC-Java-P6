@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
@@ -35,7 +36,7 @@ public class UserEntity {
     private String password;
 
     @Column(nullable = false, columnDefinition = "DOUBLE DEFAULT 0.0", insertable = false)
-    private Double sold = 0.0;
+    private BigDecimal sold = BigDecimal.ZERO;
 
     @Column(name = "role", nullable = false)
     private String role = "USER";
@@ -54,17 +55,4 @@ public class UserEntity {
     private List<TransactionEntity> transactions;
 
 
-/*    @Override
-    public String toString() {
-        return "UserEntity{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", sold=" + sold +
-                ", role='" + role + '\'' +
-                ", connections=" + connections +
-                ", transactions=" + transactions +
-                '}';
-    }*/
 }

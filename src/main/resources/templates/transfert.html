@@ -84,8 +84,8 @@
                     </div>
 
                     <div class="col-md-2">
-                        <input class="form-control" min="0.0" placeholder="0€" required step="0.10"
-                               th:field="*{amount}" type="number">
+                        <input class="form-control" min="0.0" placeholder="0.00€" required step="0.01"
+                               th:field="*{amount}" type="text" pattern="^\d+(\.\d{1,2})?$" title="Deux décimales maximum (ex: 10.00)">
                     </div>
 
                     <div class="col-md-2">
@@ -114,7 +114,7 @@
                             <td>
                                 <span th:style="${transaction.sender == userModel.email ? 'color: red;' : 'color: green;'}">
                                 <span th:text="${transaction.sender == userModel.email ? '-' : '+'}"></span>
-                                <span th:text="${transaction.amount}"></span>€</span>
+                                <span th:text="${#numbers.formatDecimal(transaction.amount, 1, 2)}"></span>€</span>
                             </td>
                         </tr>
                     </tbody>

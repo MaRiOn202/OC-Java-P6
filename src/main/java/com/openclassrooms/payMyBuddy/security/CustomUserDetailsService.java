@@ -43,8 +43,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         log.info("Utilisateur trouvé : {}", email);
 
-        log.info("Mot de passe en base : {}", userEntity.getPassword());
-
         log.info("User chargé pour l'authentification : {}", userEntity.getEmail());
 
         return new org.springframework.security.core.userdetails.User(

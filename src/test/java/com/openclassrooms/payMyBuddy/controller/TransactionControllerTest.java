@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -74,7 +75,7 @@ public class TransactionControllerTest {
 
         TransactionModel transactionModel = new TransactionModel();
         transactionModel.setReceiver("receiver@paymybuddy");
-        transactionModel.setAmount(100.00);
+        transactionModel.setAmount(BigDecimal.valueOf(100.00));
 
         List<TransactionModel> transactions = List.of(new TransactionModel(), new TransactionModel());
         Page<TransactionModel> transactionModelPage = new PageImpl<>(transactions);
@@ -104,7 +105,7 @@ public class TransactionControllerTest {
 
         TransactionModel transactionModel = new TransactionModel();
         transactionModel.setReceiver("receiver@paymybuddy");
-        transactionModel.setAmount(1000.00); // sold trop important
+        transactionModel.setAmount(BigDecimal.valueOf(1000.00)); // sold trop important
 
         when(userService.getConnectingUser()).thenReturn(userModel);
         when(transactionService.createTransaction(any(TransactionModel.class))).thenThrow(new InvalidTransactionException("Solde insuffisant"));
