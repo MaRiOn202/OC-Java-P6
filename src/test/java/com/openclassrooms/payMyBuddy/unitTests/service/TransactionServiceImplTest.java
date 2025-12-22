@@ -1,4 +1,4 @@
-package com.openclassrooms.payMyBuddy.service;
+package com.openclassrooms.payMyBuddy.unitTests.service;
 
 import com.openclassrooms.payMyBuddy.entity.TransactionEntity;
 import com.openclassrooms.payMyBuddy.entity.UserEntity;

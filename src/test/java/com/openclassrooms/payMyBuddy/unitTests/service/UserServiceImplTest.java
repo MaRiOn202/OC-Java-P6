@@ -1,4 +1,4 @@
-package com.openclassrooms.payMyBuddy.service;
+package com.openclassrooms.payMyBuddy.unitTests.service;
 
 import com.openclassrooms.payMyBuddy.entity.UserEntity;
 import com.openclassrooms.payMyBuddy.exception.UserNotFoundException;

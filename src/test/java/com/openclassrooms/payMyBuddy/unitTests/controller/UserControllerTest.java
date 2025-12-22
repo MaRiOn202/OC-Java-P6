@@ -1,7 +1,8 @@
-package com.openclassrooms.payMyBuddy.controller;
+package com.openclassrooms.payMyBuddy.unitTests.controller;
 
+import com.openclassrooms.payMyBuddy.controller.UserController;
 import com.openclassrooms.payMyBuddy.model.UserConnectionModel;
-import com.openclassrooms.payMyBuddy.model.UserLoginModel;
+
 import com.openclassrooms.payMyBuddy.model.UserModel;
 import com.openclassrooms.payMyBuddy.service.UserService;
 import org.junit.jupiter.api.Test;
@@ -16,10 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.BindingResult;
+
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

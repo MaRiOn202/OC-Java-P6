@@ -223,6 +223,7 @@ public class UserController {
         } catch (Exception e) {
             result.rejectValue("email", "error.email", e.getMessage());
             model.addAttribute("userConnectionModel", userConnectionModel);
+            model.addAttribute("error", e.getMessage());
             return "relation";
         }
 

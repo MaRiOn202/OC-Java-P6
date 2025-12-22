@@ -1,5 +1,6 @@
-package com.openclassrooms.payMyBuddy.controller;
+package com.openclassrooms.payMyBuddy.unitTests.controller;
 
+import com.openclassrooms.payMyBuddy.controller.RegisterController;
 import com.openclassrooms.payMyBuddy.model.UserModel;
 import com.openclassrooms.payMyBuddy.service.UserService;
 import org.junit.jupiter.api.Test;

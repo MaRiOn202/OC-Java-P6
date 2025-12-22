@@ -1,5 +1,6 @@
-package com.openclassrooms.payMyBuddy.controller;
+package com.openclassrooms.payMyBuddy.unitTests.controller;
 
+import com.openclassrooms.payMyBuddy.controller.TransactionController;
 import com.openclassrooms.payMyBuddy.exception.InvalidTransactionException;
 import com.openclassrooms.payMyBuddy.model.TransactionModel;
 import com.openclassrooms.payMyBuddy.model.UserConnectionModel;
