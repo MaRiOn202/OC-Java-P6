@@ -11,12 +11,13 @@ import org.openqa.selenium.WebDriver;
 public class LoginPage {
 
 
-    private WebDriver driver;
+    private final WebDriver driver;
 
     // sélecteurs
     private By emailField = By.name("email");
     private By passwordField = By.name("password");
     private By loginButton = By.cssSelector("button[type='submit']");
+    private By successAlert = By.cssSelector(".alert-info");
 
 
     public LoginPage(WebDriver driver) {
@@ -25,18 +26,24 @@ public class LoginPage {
 
 
     // actions
-    public void entrerMail(String email) {
+    public LoginPage entrerMail(String email) {
         driver.findElement(emailField).sendKeys(email);
+        return this;
     }
 
 
-    public void entrerPassword(String password) {
+    public LoginPage entrerPassword(String password) {
         driver.findElement(passwordField).sendKeys(password);
+        return this;
     }
 
-    public void clickLoginButton() {
+    public HomePage clickLoginButton() {
         driver.findElement(loginButton).click();
+        return new HomePage(driver);
     }
+
+
+
 
 
 

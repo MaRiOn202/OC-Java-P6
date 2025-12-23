@@ -30,7 +30,7 @@ public class AddFriendCasPassantTest {
         driver.findElement(By.xpath("//a[@href='/login']")).click();
 
         // connexion
-        driver.findElement(By.name("email")).sendKeys("michel8@paymybuddy.com");
+        driver.findElement(By.name("email")).sendKeys("michel7@paymybuddy.com");
         driver.findElement(By.name("password")).sendKeys("1234");
         driver.findElement(By.cssSelector("button[type='submit']")).click();
 
@@ -38,7 +38,7 @@ public class AddFriendCasPassantTest {
 
         // ajouter un ami
         driver.findElement(By.cssSelector("a[href='/relation']")).click();                    // cssSelector + fiable
-        driver.findElement(By.id("email")).sendKeys("michel1@paymybuddy.com");
+        driver.findElement(By.id("email")).sendKeys("michel3@paymybuddy.com");
         driver.findElement(By.cssSelector("button[type='submit']")).click();
 
         WebElement successAlert = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("alert")));

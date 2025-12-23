@@ -39,7 +39,7 @@ public class AddFriendCasNonPassantTest {
 
         // ajouter un ami
         driver.findElement(By.cssSelector("a[href='/relation']")).click();                    // cssSelector + fiable
-        driver.findElement(By.id("email")).sendKeys("michel5@paymybuddy.com");
+        driver.findElement(By.id("email")).sendKeys("michel1@paymybuddy.com");
         driver.findElement(By.cssSelector("button[type='submit']")).click();
 
         WebElement errorAlert = wait.until(
